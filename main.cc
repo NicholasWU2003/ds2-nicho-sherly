@@ -1,4 +1,6 @@
 #include <iostream>
+#include <fstream>
+#include <vector>
 
 // instructies:
     // exp <expressie>
@@ -19,3 +21,14 @@
 // 
 // 
 // 
+
+#include <iostream>
+#include <vector>
+
+int main()
+{
+    
+        
+
+    return 0;
+}
