@@ -7,14 +7,22 @@
 
 
 struct Token {
-    enum {
+    enum
+    {
         PLUS,
         MINUS,
+        DIVIDE,
+        MULTIPLY,
         NUMBER,
-        VARIABLE
+        VARIABLE,
+        SINE,
+        COSINE,
+        TANGENT
     } type;
+
     
-    union {
+    union
+    {
         char variable;
         double number;
     };
@@ -24,11 +32,11 @@ struct Token {
 class binaireBoom
 {
     public:
-        bool leesIn(const char* invoerNaam);
+        std::vector<Token> leesIn(const char* invoerNaam);
+        std::string drukaf1();
 
     private:
-        std::vector<std::string> woorden;
-
+        std::vector<std::string> infix;
 
 };
 

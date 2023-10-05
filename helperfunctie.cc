@@ -6,28 +6,86 @@
 
 
 
-bool binaireBoom::leesIn (const char* invoerNaam)
+std::vector<Token> binaireBoom::leesIn (const char* invoerNaam)
 {
+    std::vector<Token> tokens;
+
     std::ifstream invoer;
     invoer.open(invoerNaam, std::ios::in);
-        if (!invoer.is_open())
-        {
-            std::cout << std::endl << "Gegeven bestand is niet gevonden." << std::endl;
+        
 
-            return false;
-        }
-        std::vector<std::string> woorden;
-        std:: string woord;
+        std:: string huidig;
+        Token token;
 
-        while (invoer >> woord){
-            woorden.push_back(woord);
+        while (invoer >> huidig){
+        
+          if (huidig == " ")
+          {// spaties overslaan
+            continue;
+          }
+          else if (huidig == "+")
+          {
+            token.type = Token::PLUS;
+            tokens.push_back(token);
+          }
+          else if (huidig == "-")
+          {
+            token.type = Token::MINUS;
+            tokens.push_back(token);
+          }
+          else if (huidig == "*")
+          {
+            token.type = Token::MULTIPLY;
+            tokens.push_back(token);
+          }
+          else if (huidig == "/")
+          {
+            token.type = Token::DIVIDE;
+            tokens.push_back(token);
+          }
+          else if (huidig >= "a" && huidig <= "z")
+          {
+            token.type = Token::VARIABLE;
+            tokens.push_back(token);
+          }
+          else if (huidig >= "1" && huidig <= "9")
+          {// idk als huidig bv 386 is herkent die dat?
+            token.type = Token::NUMBER;
+            tokens.push_back(token);
+          }
+          else if (huidig == "cos")
+          {
+            token.type = Token::COSINE;
+            tokens.push_back(token);
+          }
+          else if (huidig == "sin")
+          {
+            token.type = Token::SINE;
+            tokens.push_back(token);
+          }
+          else if (huidig == "tan")
+          {
+            token.type = Token::TANGENT;
+            tokens.push_back(token);
+          }
+          else
+          {
+            std::cout << "de formule klopt niet!" << std::endl;
+            break;
+          }
+
+
         }
 
         invoer.close();
     
-    for (const std::string& w : woorden) 
-    {
-        std::cout << w << std::endl;
-    }
-        
+    return tokens;
+}
+
+std::string binaireBoom::drukaf1()
+{
+  int grootte = elementen.size();
+
+
+
 }
