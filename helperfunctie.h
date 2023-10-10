@@ -21,6 +21,7 @@ struct Token{
         SINE,
         COSINE,
         TANGENT
+    
     } type;
 
     
@@ -38,12 +39,15 @@ class binaireBoom{
         binaireBoom();
         binaireBoom(std::vector<std::string> invoer);
         void maakToken(std::string karakter);
-        bool leesIn(const char* invoerNaam);
+        bool leesIn(std::string invoerNaam);
+        void printTokens() const; 
+        void maakBoom();
 
     private:
         std::vector<std::string> prefix;
         std::vector<Token> tokens;
         Token* begin;
+        bool haakjes = false;
 
 
 };

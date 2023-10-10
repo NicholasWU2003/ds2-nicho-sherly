@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include "helperfunctie.h"
 
 // instructies:
     // exp <expressie>
@@ -26,8 +27,14 @@
 #include <vector>
 
 int main(){
-    
-        
+
+        binaireBoom boom;
+        std::string invoerNaam;
+        std::cout << "Geef de naam van het bestand: " << std::endl;
+        std::cin >> invoerNaam;
+        boom.leesIn(invoerNaam);
+
+        boom.printTokens();
 
     return 0;
 }
