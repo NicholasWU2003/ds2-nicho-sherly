@@ -6,28 +6,40 @@
 #include <vector>
 
 
-struct Token {
-    enum {
+struct Token{
+    enum{
         PLUS,
         MINUS,
+        POWER,
+        DIVIDE,
+        TIMES,
+        SIN,
+        COS,
+        PI,
         NUMBER,
         VARIABLE
     } type;
     
-    union {
+    union{
         char variable;
         double number;
     };
+
+    Token* links = nullptr;
+    Token* rechts = nullptr;
 };
 
-
-class binaireBoom
-{
+class binaireBoom{
     public:
+        binaireBoom();
+        binaireBoom(std::vector<std::string> invoer);
+        void maakToken(std::string karakter);
         bool leesIn(const char* invoerNaam);
 
     private:
-        std::vector<std::string> woorden;
+        std::vector<std::string> prefix;
+        std::vector<Token> tokens;
+        Token* begin;
 
 
 };
