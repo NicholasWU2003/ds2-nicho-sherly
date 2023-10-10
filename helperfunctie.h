@@ -17,8 +17,12 @@ struct Token{
         COS,
         PI,
         NUMBER,
-        VARIABLE
+        VARIABLE,
+        SINE,
+        COSINE,
+        TANGENT
     } type;
+
     
     union{
         char variable;

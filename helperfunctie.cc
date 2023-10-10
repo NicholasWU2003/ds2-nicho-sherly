@@ -80,13 +80,7 @@ bool binaireBoom::leesIn (const char* invoerNaam){
         if (!invoer.is_open()){
             std::cout << std::endl << "Gegeven bestand is niet gevonden." << std::endl;
 
-            return false;
-        }
-        std::vector<std::string> woorden;
-        std:: string woord;
 
-        while (invoer >> woord){
-            woorden.push_back(woord);
         }
 
         invoer.close();
