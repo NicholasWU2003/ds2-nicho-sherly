@@ -18,11 +18,7 @@ struct Token{
         PI,
         NUMBER,
         VARIABLE,
-        SINE,
-        COSINE,
-        TANGENT
     } type;
-
     
     union{
         char variable;
@@ -37,14 +33,14 @@ class binaireBoom{
     public:
         binaireBoom();
         binaireBoom(std::vector<std::string> invoer);
-        void maakToken(std::string karakter);
+        void maakBoom(Token token);
+        bool maakToken(std::string karakter);
         bool leesIn(const char* invoerNaam);
 
     private:
         std::vector<std::string> prefix;
         std::vector<Token> tokens;
         Token* begin;
-
 
 };
 

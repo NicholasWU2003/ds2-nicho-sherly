@@ -3,11 +3,10 @@
 #include <vector>
 #include "helperfunctie.h"
 
-void binaireBoom::maakToken(std::string kar){
+bool binaireBoom::maakToken(std::string kar){
     struct Token huidig;
     struct Token* hulp =  &huidig;
 
-    
     if(begin == nullptr)
     {
         begin = hulp;
@@ -55,10 +54,15 @@ void binaireBoom::maakToken(std::string kar){
             }
             
         }catch(const std::invalid_argument&){
-            return;
+            return false;
         }
     }
     tokens.push_back(huidig);
+    return true;
+}
+
+void binaireBoom::maakBoom(Token token){
+
 }
 
 
@@ -77,13 +81,12 @@ binaireBoom::binaireBoom(std::vector<std::string> invoer){
 bool binaireBoom::leesIn (const char* invoerNaam){
     std::ifstream invoer;
     invoer.open(invoerNaam, std::ios::in);
-        if (!invoer.is_open()){
-            std::cout << std::endl << "Gegeven bestand is niet gevonden." << std::endl;
+    if (!invoer.is_open()){
+        std::cout << std::endl << "Gegeven bestand is niet gevonden." << std::endl;
 
 
-        }
-
-        invoer.close();
+    }
+    invoer.close();
     
     for (const std::string& w : woorden){
         std::cout << w << std::endl;
