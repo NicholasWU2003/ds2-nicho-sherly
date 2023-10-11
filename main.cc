@@ -27,14 +27,12 @@
 #include <vector>
 
 int main(){
-
-        binaireBoom boom;
+  
         std::string invoerNaam;
         std::cout << "Geef de naam van het bestand: " << std::endl;
-        std::cin >> invoerNaam;
-        boom.leesIn(invoerNaam);
+        binaireBoom boom("test.txt");
 
-        boom.printTokens();
 
+  
     return 0;
 }

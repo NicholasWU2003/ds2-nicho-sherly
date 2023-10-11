@@ -13,8 +13,9 @@ struct Token{
         POWER,
         DIVIDE,
         TIMES,
-        SIN,
-        COS,
+        SINE,
+        COSINE,
+        TANGENT,
         PI,
         NUMBER,
         VARIABLE,
@@ -32,16 +33,20 @@ struct Token{
 class binaireBoom{
     public:
         binaireBoom();
-        binaireBoom(std::vector<std::string> invoer);
-        void maakBoom(Token token);
+        binaireBoom(std::string invoerNaam);
+        Token maakBoom(Token token);
         bool maakToken(std::string karakter);
-        bool leesIn(const char* invoerNaam);
+        std::vector<std::string> leesIn(std::string invoerNaam);
+        void printIO(Token token);
 
     private:
         std::vector<std::string> prefix;
         std::vector<Token> tokens;
         Token* begin;
-        bool haakjes = false;
+        int huidigTokenIndex;
+        std::vector<std::string> lijstje;
+
+
 
 };
 
