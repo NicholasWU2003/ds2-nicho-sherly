@@ -28,6 +28,7 @@ struct Token{
 
     Token* links = nullptr;
     Token* rechts = nullptr;
+
 };
 
 class binaireBoom{
@@ -44,7 +45,7 @@ class binaireBoom{
         std::vector<Token> tokens;
         Token* begin;
         int huidigTokenIndex;
-        std::vector<std::string> lijstje;
+        
 
 
 

@@ -42,6 +42,9 @@ bool binaireBoom::maakToken(std::string kar){
                 else if(kar == "*"){
                     huidig.type = Token::TIMES;
                 }
+                else if(kar == "/"){
+                    huidig.type = Token::DIVIDE;
+                }
                 else if(kar == "p"){
                     huidig.type = Token::PI;
                     huidig.variable = 'p';
@@ -51,19 +54,7 @@ bool binaireBoom::maakToken(std::string kar){
                     huidig.type = Token::VARIABLE;
                     huidig.variable = kar[0];
                 }
-                else if(kar == "(")
-                {
-                    haakjes = true;
-                }
-                else if (kar == ")")
-                {
-                    if (!haakjes)
-                    {
-                        std::cout << "invoer klopt niet" << std::endl;
-                        return false;
-                    }
-                    haakjes = false;
-                }
+            
             }catch(const std::invalid_argument&){
                 return false;
             }   
@@ -87,12 +78,15 @@ binaireBoom::binaireBoom(std::string invoerNaam){
 
     Token temp = maakBoom(tokens[huidigTokenIndex]);
     begin = &temp;
+
+    printIO(temp);
     
 }
  
 std::vector<std::string> binaireBoom::leesIn(std::string invoerNaam){
     std::ifstream invoer;
     std::string huidig;
+    std::vector<std::string> lijstje;
     
     invoer.open(invoerNaam, std::ios::in);
     if (!invoer.is_open()){
@@ -135,30 +129,46 @@ Token binaireBoom::maakBoom(Token token)// + * 1 23
 }
 
 
-void printIO(Token token){
+
+
+void binaireBoom::printIO(Token token){
+
     if(token.type  == 8 || token.type == 7 || token.type == 9){//NUMMER && PI & variable
-        std::cout << lijstje[huidigTokenIndex] << std::endl;
+    
+        std::cout << tokens[huidigTokenIndex].variable;
+        std::cout << tokens[huidigTokenIndex].number;
+        return;
 
     }
     else if(token.type == 0 || token.type == 1 || token.type ==2 || token.type == 4){ // plus min keer macht
+        std::cout << "(";
         huidigTokenIndex++;// volgende
-        Token temp = printIO(tokens[huidigTokenIndex]);
-        token.links = &temp;
+        printIO(tokens[huidigTokenIndex]);
         
-        std::cout << lijstje[huidigTokenIndex] << std::endl;
+       switch (token.type) {
+            case 0: std::cout << "+"; break;
+            case 1: std::cout << "-"; break;
+            case 2: std::cout << "^"; break;
+            case 4: std::cout << "*"; break;
+       }
 
         huidigTokenIndex++;
-        temp = printIO(tokens[huidigTokenIndex]);
-        token.rechts = &temp;
+        printIO(tokens[huidigTokenIndex]);
+        std::cout << ")";
 
     }
     else if (token.type == 10 || token.type == 11 || token.type == 12){ // cos sin tan
+
+        std::cout << "";
+        switch (token.type) {
+                case 10: std::cout << "sin("; break;
+                case 11: std::cout << "cos("; break;
+                case 12: std::cout << "tan("; break;
+            }
+
         huidigTokenIndex++;
-        Token temp = printIO(tokens[huidigTokenIndex]);
-        token.links = &temp;
-
-        std::cout << lijstje[huidigTokenIndex] << std::endl;
-
+        printIO(tokens[huidigTokenIndex]);
+        std::cout << ")";
     }
 
 }
