@@ -41,6 +41,7 @@ class binaireBoom{
         std::vector<std::string> prefix;
         std::vector<Token> tokens;
         Token* begin;
+        bool haakjes = false;
 
 };
 
