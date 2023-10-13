@@ -30,7 +30,7 @@ int main(){
   
         std::string invoerNaam;
         std::cout << "Geef de naam van het bestand: " << std::endl;
-        binaireBoom boom("test.txt");
+        binaireBoom boom("test.txt"); 
 
 
   

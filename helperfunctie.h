@@ -42,6 +42,7 @@ class binaireBoom{
 
     private:
         std::vector<std::string> prefix;
+        std::vector<std::string> inorder;
         std::vector<Token> tokens;
         Token* begin;
         int huidigTokenIndex;
