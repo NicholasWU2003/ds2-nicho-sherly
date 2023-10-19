@@ -35,10 +35,11 @@ class binaireBoom{
     public:
         binaireBoom();
         binaireBoom(std::string invoerNaam);
-        Token maakBoom(Token token);
+        std::string enumToString(int type);
+        Token* maakBoom(Token token);
         bool maakToken(std::string karakter);
         std::vector<std::string> leesIn(std::string invoerNaam);
-        void printIO(Token token);
+        void printIO(Token* token);
 
     private:
         std::vector<std::string> prefix;
@@ -46,9 +47,7 @@ class binaireBoom{
         std::vector<Token> tokens;
         Token* begin;
         int huidigTokenIndex;
-        
-
-
+        int haakje;
 
 };
 

@@ -3,6 +3,21 @@
 #include <vector>
 #include "helperfunctie.h"
 
+std::string binaireBoom::enumToString(int type){
+    switch (type){
+        case Token::PLUS: return "+";
+        case Token::MINUS: return "-";
+        case Token::POWER: return "^";
+        case Token::DIVIDE: return "/";
+        case Token::TIMES: return "*";
+        case Token::SINE: return "sin";
+        case Token::COSINE: return "cos";
+        case Token::TANGENT: return "tan";
+        case Token::PI: return "pi";
+        default: return "unknown";
+    }
+}
+
 bool binaireBoom::maakToken(std::string kar){
     struct Token huidig;
 
@@ -71,18 +86,27 @@ binaireBoom::binaireBoom(std::string invoerNaam){
     
     std::vector<std::string> invoer = leesIn(invoerNaam);
     huidigTokenIndex = 0;
-    bool a;
+    haakje = 0;
 
     for(const std::string element : invoer){
-        a = maakToken(element);
+        if(!maakToken(element))
+        {
+            std::cout << "klopt niet" << std::endl;
+        }
     }
 
-    Token temp = maakBoom(tokens[huidigTokenIndex]);
-    begin = &temp;
-    std::cout << temp.type << std::endl;
+    // Token temp = maakBoom(tokens[huidigTokenIndex]);
+    // begin = &temp;
+    Token* temp = maakBoom(tokens[huidigTokenIndex]);
+    begin = temp;
 
-    huidigTokenIndex = 0;
+    // std::cout << temp.links->type << std::endl;
+
+    // huidigTokenIndex = 0;
     // printIO(temp);
+    std::cout << "Inorder Traversal: ";
+    printIO(begin);
+    std::cout << std::endl;
     
 }
  
@@ -108,32 +132,59 @@ std::vector<std::string> binaireBoom::leesIn(std::string invoerNaam){
 }
 
 
-Token binaireBoom::maakBoom(Token token)// + * 1 23
-{   
-    if(token.type == Token::NUMBER|| token.type == Token::VARIABLE || token.type == Token::PI){//NUMMER && PI & variable
+// Token binaireBoom::maakBoom(Token token)// + * 1 23
+// {   
+//     if(token.type == Token::NUMBER|| token.type == Token::VARIABLE || token.type == Token::PI){//NUMMER && PI & variable
+//         return(token);
+//     }
+//     else if(token.type == 0 || token.type == 1 || token.type == 2 ||token.type == 3 || token.type == 4){ // plus min keer delen macht
+//         huidigTokenIndex++;// volgende
+//         Token temp = maakBoom(tokens[huidigTokenIndex]);
+//         token.links = &temp;
+
+//         huidigTokenIndex++;
+//         temp = maakBoom(tokens[huidigTokenIndex]);
+//         token.rechts = &temp;
         
-        return(token);
+//         return(token);
+//     }
+//     else if (token.type == 10 || token.type == 11 || token.type == 12){ // cos sin tan
+//         huidigTokenIndex++;
+//         Token temp = maakBoom(tokens[huidigTokenIndex]);
+//         token.links = &temp;
+//         return(token);
+//     }
+
+//     return(token);
+// }
+
+Token* binaireBoom::maakBoom(Token token) {
+
+    if (token.type == Token::NUMBER || token.type == Token::VARIABLE || token.type == Token::PI) {
+        return new Token(token);
     }
-    else if(token.type == 0 || token.type == 1 || token.type == 2 ||token.type == 3 || token.type == 4){ // plus min keer delen macht
-        huidigTokenIndex++;// volgende
-        Token temp = maakBoom(tokens[huidigTokenIndex]);
-        token.links = &temp;
+    else if (token.type == 0 || token.type == 1 || token.type == 2 || token.type == 3 || token.type == 4) {
+        huidigTokenIndex++;
+        Token* temp1 = maakBoom(tokens[huidigTokenIndex]);
+        token.links = temp1;
 
         huidigTokenIndex++;
-        temp = maakBoom(tokens[huidigTokenIndex]);
-        token.rechts = &temp;
-        
-        return(token);
+        Token* temp2 = maakBoom(tokens[huidigTokenIndex]);
+        token.rechts = temp2;
+
+        return new Token(token);
     }
-    else if (token.type == 10 || token.type == 11 || token.type == 12){ // cos sin tan
+    else if (token.type == 5 || token.type == 6 || token.type == 7) {
         huidigTokenIndex++;
-        Token temp = maakBoom(tokens[huidigTokenIndex]);
-        token.links = &temp;
-        return(token);
+        Token* temp3 = maakBoom(tokens[huidigTokenIndex]);
+        token.links = temp3;
+        token.rechts = nullptr;
+        return new Token(token);
     }
 
-    return(token);
+    return new Token(token);
 }
+
 
 // void binaireBoom::printIO(Token token){
 //     // stel eerste is een nummer toch
@@ -191,72 +242,109 @@ Token binaireBoom::maakBoom(Token token)// + * 1 23
 
 // }
 
-void binaireBoom::printIO(Token token){
-
-    if (token.type == Token::NUMBER) {
-        
-        std::cout << token.number;
-        return;
-
-    }
-    else if (token.type == Token::VARIABLE || token.type == Token::PI) {
-        std::cout << token.variable;
+void binaireBoom::printIO(Token* begin) {
+    if (begin == nullptr) {
         return;
     }
-    else if(token.type == Token::PLUS || token.type == Token::MINUS 
-                || token.type == Token::POWER || token.type == Token::TIMES 
-                || token.type == Token::TIMES){ 
 
-        std::cout << "(";
+    if(begin->type == 5)
+    {
+        std::cout << enumToString(begin->type) << "(";
+        haakje++;
 
-        if(token.links != nullptr)
-        {
-            Token temp = *(token.links);
+    }
+    // Traverse the left subtree (links)
+    printIO(begin->links);
 
-            printIO(temp);
+    // Print the current node's value (assuming Token has a value field)
+    if(begin->type == 9){
+        std::cout << begin->number << " ";
+
+    }
+    else if (begin->type == 10){
+        std::cout << begin->variable << " ";
+    }
+    else{
+        if(begin->type != 5){
+            std::cout << enumToString(begin->type) << " ";
         }
-
-        
-       switch (token.type) {
-            case Token::PLUS: std::cout << "+"; break;
-            case Token::MINUS: std::cout << "-"; break;
-            case Token::POWER: std::cout << "^"; break;
-            case Token::DIVIDE: std::cout << "/"; break;
-            case Token::TIMES: std::cout << "*"; break;
-            default:break;
-       }
-
-        huidigTokenIndex++;
-
-        if(token.rechts != nullptr)
-        {
-            Token temp = *(token.rechts);
-            printIO(temp);
-        }
-
-        std::cout << ")";
-        return;
-
-    }
-    else if (token.type == Token::SINE || token.type == Token::COSINE || token.type == Token::TANGENT){ 
-
-        std::cout << "";
-        
-        switch (token.type) {
-                case Token::SINE: std::cout << "sin("; break;
-                case Token::COSINE: std::cout << "cos("; break;
-                case Token::TANGENT: std::cout << "tan("; break;
-                default: break;
-            }
-
-        if(token.links != nullptr)
-        {
-            Token temp = *(token.links);
-            printIO(temp);
-        }
-
-        std::cout << ")";
-        return;
     }
 
+    // Traverse the right subtree (rechts)
+    printIO(begin->rechts);
+
+    if(haakje>0){
+        std::cout << ") ";
+        haakje--;
+    }
 }
+
+// void binaireBoom::printIO(Token token){
+
+//     if (token.type == Token::NUMBER) {
+        
+//         std::cout << token.number;
+//         return;
+
+//     }
+//     else if (token.type == Token::VARIABLE || token.type == Token::PI) {
+//         std::cout << token.variable;
+//         return;
+//     }
+//     else if(token.type == Token::PLUS || token.type == Token::MINUS 
+//                 || token.type == Token::POWER || token.type == Token::TIMES 
+//                 || token.type == Token::TIMES){ 
+
+//         std::cout << "(";
+
+//         if(token.links != nullptr)
+//         {
+//             Token temp = *(token.links);
+
+//             printIO(temp);
+//         }
+
+        
+//        switch (token.type) {
+//             case Token::PLUS: std::cout << "+"; break;
+//             case Token::MINUS: std::cout << "-"; break;
+//             case Token::POWER: std::cout << "^"; break;
+//             case Token::DIVIDE: std::cout << "/"; break;
+//             case Token::TIMES: std::cout << "*"; break;
+//             default:break;
+//        }
+
+//         huidigTokenIndex++;
+
+//         if(token.rechts != nullptr)
+//         {
+//             Token temp = *(token.rechts);
+//             printIO(temp);
+//         }
+
+//         std::cout << ")";
+//         return;
+
+//     }
+//     else if (token.type == Token::SINE || token.type == Token::COSINE || token.type == Token::TANGENT){ 
+
+//         std::cout << "";
+        
+//         switch (token.type) {
+//                 case Token::SINE: std::cout << "sin("; break;
+//                 case Token::COSINE: std::cout << "cos("; break;
+//                 case Token::TANGENT: std::cout << "tan("; break;
+//                 default: break;
+//             }
+
+//         if(token.links != nullptr)
+//         {
+//             Token temp = *(token.links);
+//             printIO(temp);
+//         }
+
+//         std::cout << ")";
+//         return;
+//     }
+
+// }
