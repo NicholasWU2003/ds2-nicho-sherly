@@ -49,30 +49,21 @@ bool binaireBoom::maakToken(std::string kar){
     else if (kar == "/"){
         huidig.type = Token::DIVIDE;
     }
-    else if (kar >= "0" && kar <= "9"){
-        try{
-            int getal = std::stoi(kar);
-            huidig.type = Token::NUMBER;
-            huidig.number = getal;
-        }
-        catch (const std::invalid_argument&){
-            try{
-                double dGetal = std::stod(kar);
-                huidig.type = Token::NUMBER;
-                huidig.number = dGetal;
-            }
-            catch (const std::invalid_argument&){
-                return false; // kar is not a valid number
-            }
-        }
-    }
     else if((kar >= "a" && kar <= "z") || (kar >= "A" && kar <= "Z")){
         huidig.type = Token::VARIABLE;
         huidig.variable = kar[0];
     }
-    else{
-        std::cout << "dit:" << kar << "bestaat niet";
-        return false; // kar doesn't match any known token type
+    else{ // kijken of het een getal is 
+        try {
+            double getal = std::stod(kar);
+            huidig.type = Token::NUMBER;
+            huidig.number = getal;
+        }
+        catch (const std::invalid_argument&){ // anders bestaat niet 
+            std::cout << "dit:" << kar << "bestaat niet";
+            return false; 
+
+        }
     }
 
     tokens.push_back(huidig);
@@ -106,6 +97,8 @@ binaireBoom::binaireBoom(std::string invoerNaam){
     std::cout << "Inorder Traversal: ";
     printIO(begin);
     std::cout << std::endl;
+
+    printDOT("testFile.dot");
     
 }
  
@@ -174,7 +167,7 @@ void binaireBoom::printIO(Token* huidigeRoot) {
 
     printIO(huidigeRoot->links);
 
-    // Print the current node's value (assuming Token has a value field)
+    // Print the current token's value (assuming Token has a value field)
     if(huidigeRoot->type == 9){
         std::cout << huidigeRoot->number;
 
@@ -201,5 +194,58 @@ void binaireBoom::printIO(Token* huidigeRoot) {
         std::cout << ")";
 
     }
+}
+
+void  binaireBoom::printDOT(const std::string& uitvoerNaam){
+    std::ofstream dotFile(uitvoerNaam);
+
+    if (!dotFile) {
+        std::cerr << "Kan niet wegschrijven!" << std::endl;
+        return;
+    }
+
+    dotFile << "digraph G {\n" << std::endl;
+    printHelpDOT(begin, dotFile);
+    dotFile << "}\n";
+
+    dotFile.close();
+
+}
+
+void binaireBoom::printHelpDOT(Token* token, std::ofstream& dotFile){
+    if (!token){
+        return;
+    }
+
+    int telHuidig = telDOT++;
+    int telLinks;
+    int telRechts;
+
+    if (token->links) {
+        telLinks = telDOT;
+        dotFile << telHuidig << ")  [label = \" "<< plaatsToken(token) <<  " \" ]" <<  std::endl;
+        dotFile << telLinks << ")  [label = \" "<< plaatsToken(token->links) <<  " \" ]" << std::endl;
+        dotFile << telHuidig << " -> " << telLinks  << std::endl;
+        printHelpDOT(token->links, dotFile);
+    }
+    if (token->rechts) {
+        telRechts = telDOT;
+        dotFile << telRechts << ")   [label = \" "<< plaatsToken(token->rechts) <<  " \" ]" << std::endl;
+        dotFile << telHuidig << " -> " << telRechts  << std::endl;
+        printHelpDOT(token->rechts, dotFile);
+    }
+}
+
+std::string binaireBoom::plaatsToken(Token* token){
+    if (!token) return "";
+
+    if (token->type == Token::NUMBER) {
+        return std::to_string(float(token->number));
+    } else if (token->type == Token::VARIABLE) {
+        return std::string(1, token->variable);
+    } else {
+        return enumToString(token->type);
+    }
+
 }
 
