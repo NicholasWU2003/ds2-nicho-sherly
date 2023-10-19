@@ -47,7 +47,6 @@ class binaireBoom{
         std::vector<Token> tokens;
         Token* begin;
         int huidigTokenIndex;
-        int haakje;
 
 };
 
