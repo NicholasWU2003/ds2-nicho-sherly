@@ -223,14 +223,16 @@ void binaireBoom::printHelpDOT(Token* token, std::ofstream& dotFile){
 
     if (token->links) {
         telLinks = telDOT;
-        dotFile << telHuidig << ")  [label = \" "<< plaatsToken(token) <<  " \" ]" <<  std::endl;
-        dotFile << telLinks << ")  [label = \" "<< plaatsToken(token->links) <<  " \" ]" << std::endl;
+        // huidig
+        dotFile << telHuidig << "  [label = \" "<< plaatsToken(token) <<  " \" ]" <<  std::endl;
+        //links 
+        dotFile << telLinks << "  [label = \" "<< plaatsToken(token->links) <<  " \" ]" << std::endl;
         dotFile << telHuidig << " -> " << telLinks  << std::endl;
         printHelpDOT(token->links, dotFile);
     }
     if (token->rechts) {
         telRechts = telDOT;
-        dotFile << telRechts << ")   [label = \" "<< plaatsToken(token->rechts) <<  " \" ]" << std::endl;
+        dotFile << telRechts << "   [label = \" "<< plaatsToken(token->rechts) <<  " \" ]" << std::endl;
         dotFile << telHuidig << " -> " << telRechts  << std::endl;
         printHelpDOT(token->rechts, dotFile);
     }
@@ -240,7 +242,9 @@ std::string binaireBoom::plaatsToken(Token* token){
     if (!token) return "";
 
     if (token->type == Token::NUMBER) {
-        return std::to_string(float(token->number));
+        double getal = token->number;
+        std::cout << getal<< "dit is getal" <<  std::endl;
+        return std::to_string(getal);
     } else if (token->type == Token::VARIABLE) {
         return std::string(1, token->variable);
     } else {

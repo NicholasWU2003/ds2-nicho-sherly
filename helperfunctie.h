@@ -50,7 +50,7 @@ class binaireBoom{
         std::vector<Token> tokens;
         Token* begin;
         int huidigTokenIndex;
-        int telDOT = 0;
+        int telDOT = 1;
 
 };
 
