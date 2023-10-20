@@ -50,21 +50,10 @@ bool binaireBoom::maakToken(std::string kar){
         huidig.type = Token::DIVIDE;
     }
     else if (kar >= "0" && kar <= "9"){
-        try{
-            int getal = std::stoi(kar);
-            huidig.type = Token::NUMBER;
-            huidig.number = getal;
-        }
-        catch (const std::invalid_argument&){
-            try{
-                double dGetal = std::stod(kar);
-                huidig.type = Token::NUMBER;
-                huidig.number = dGetal;
-            }
-            catch (const std::invalid_argument&){
-                return false; // kar is not a valid number
-            }
-        }
+        double getal = std::stod(kar);
+        huidig.type = Token::NUMBER;
+        huidig.number = getal;
+        
     }
     else if((kar >= "a" && kar <= "z") || (kar >= "A" && kar <= "Z")){
         huidig.type = Token::VARIABLE;
@@ -94,15 +83,9 @@ binaireBoom::binaireBoom(std::string invoerNaam){
         }
     }
 
-    // Token temp = maakBoom(tokens[huidigTokenIndex]);
-    // begin = &temp;
     Token* temp = maakBoom(tokens[huidigTokenIndex]);
     begin = temp;
 
-    // std::cout << temp.links->type << std::endl;
-
-    // huidigTokenIndex = 0;
-    // printIO(temp);
     std::cout << "Inorder Traversal: ";
     printIO(begin);
     std::cout << std::endl;
@@ -158,6 +141,7 @@ Token* binaireBoom::maakBoom(Token token) {
 }
 
 void binaireBoom::printIO(Token* huidigeRoot) {
+
     if (huidigeRoot == nullptr) {
         return;
     }
@@ -192,7 +176,7 @@ void binaireBoom::printIO(Token* huidigeRoot) {
     printIO(huidigeRoot->rechts);
 
     // begin->type == 9 || begin->type == 10 || 
-    if (huidigeRoot->type >= 0 && huidigeRoot->type <= 4&& huidigeRoot!=begin) {
+    if (huidigeRoot->type >= 0 && huidigeRoot->type <= 4 && huidigeRoot!=begin) {
         std::cout << ")";
     }
 
