@@ -71,13 +71,19 @@ bool binaireBoom::maakToken(std::string kar){
 }
 
 
-binaireBoom::binaireBoom(){}
+binaireBoom::binaireBoom(){
+    begin = nullptr;
+    telDOT = 1;
+    huidigTokenIndex = 0;
+
+}
 
 
 binaireBoom::binaireBoom(std::string invoerNaam){
     
     std::vector<std::string> invoer = leesIn(invoerNaam);
     huidigTokenIndex = 0;
+    telDOT = 1;
 
     for(const std::string element : invoer){
         if(!maakToken(element))
@@ -89,18 +95,15 @@ binaireBoom::binaireBoom(std::string invoerNaam){
     Token* temp = maakBoom(tokens[huidigTokenIndex]);
     begin = temp;
 
-    std::cout << "Inorder Traversal: ";
-    printIO(begin);
-    std::cout << std::endl;
-
-    printDOT("testFile.dot");
+    std::cout << "begin type: " << begin->type << std::endl;
     
 }
 
 binaireBoom::~binaireBoom(){
+    if(begin != nullptr){
+        verwijderBoom(begin);
 
-    verwijderBoom(begin);
-
+    }
 }
 
 void binaireBoom::verwijderBoom(Token* token){
@@ -141,6 +144,7 @@ Token* binaireBoom::maakBoom(Token token) {
     if (token.type >= 8 && token.type <= 10) {
         token.links = nullptr;
         token.rechts = nullptr;
+
         return new Token(token);
     }
     else if (token.type >= 0 && token.type <= 4) {
@@ -164,16 +168,28 @@ Token* binaireBoom::maakBoom(Token token) {
 
     delete token.links;
     delete token.rechts;
-
     return new Token(token);
 }
 
-void binaireBoom::printIO(Token* huidigeRoot) {
+void binaireBoom::printIOCall(){
+
+    std::cout << "Inorder Traversal: " << std::endl;
+    if(begin != nullptr){
+        printIO(begin);
+
+    }
+    else{
+        std::cout << "There is no tree";
+    }
+    std::cout << std::endl;
+
+}
+
+void binaireBoom::printIO(Token* huidigeRoot){
 
     if(huidigeRoot == nullptr){
         return;
     }
-
 
     if(huidigeRoot->type >= 5 && huidigeRoot->type <= 7){ // sin cos tan als eerst printen
         std::cout << enumToString(huidigeRoot->type) << "(";
@@ -189,7 +205,6 @@ void binaireBoom::printIO(Token* huidigeRoot) {
     // print the token
     if(huidigeRoot->type == 9){
         std::cout << huidigeRoot->number;
-
     }
     else if (huidigeRoot->type == 10){
         std::cout << huidigeRoot->variable;
@@ -210,6 +225,11 @@ void binaireBoom::printIO(Token* huidigeRoot) {
         std::cout << ")";
 
     }
+
+}
+
+void binaireBoom::printDOTCall(){
+    printDOT("testFile.dot");
 
 }
 
