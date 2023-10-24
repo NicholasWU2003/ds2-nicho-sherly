@@ -49,19 +49,21 @@ bool binaireBoom::maakToken(std::string kar){
     else if (kar == "/"){
         huidig.type = Token::DIVIDE;
     }
-    else if (kar >= "0" && kar <= "9"){
-        double getal = std::stod(kar);
-        huidig.type = Token::NUMBER;
-        huidig.number = getal;
-        
-    }
     else if((kar >= "a" && kar <= "z") || (kar >= "A" && kar <= "Z")){
         huidig.type = Token::VARIABLE;
         huidig.variable = kar[0];
     }
-    else{
-        std::cout << "dit:" << kar << "bestaat niet";
-        return false; // kar doesn't match any known token type
+    else{ // kijken of het een getal is 
+        try {
+            double getal = std::stod(kar);
+            huidig.type = Token::NUMBER;
+            huidig.number = getal;
+        }
+        catch (const std::invalid_argument&){ // anders bestaat niet 
+            std::cout << "dit:" << kar << "bestaat niet";
+            return false; 
+
+        }
     }
 
     tokens.push_back(huidig);
@@ -70,6 +72,7 @@ bool binaireBoom::maakToken(std::string kar){
 
 
 binaireBoom::binaireBoom(){}
+
 
 binaireBoom::binaireBoom(std::string invoerNaam){
     
@@ -89,7 +92,27 @@ binaireBoom::binaireBoom(std::string invoerNaam){
     std::cout << "Inorder Traversal: ";
     printIO(begin);
     std::cout << std::endl;
+
+    printDOT("testFile.dot");
     
+}
+
+binaireBoom::~binaireBoom(){
+
+    verwijderBoom(begin);
+
+}
+
+void binaireBoom::verwijderBoom(Token* token){
+
+    if(token == nullptr){
+        return;
+    }
+    verwijderBoom(token->links);
+    verwijderBoom(token->rechts);
+
+    delete token;
+
 }
  
 std::vector<std::string> binaireBoom::leesIn(std::string invoerNaam){
@@ -115,10 +138,12 @@ std::vector<std::string> binaireBoom::leesIn(std::string invoerNaam){
 
 Token* binaireBoom::maakBoom(Token token) {
 
-    if (token.type == Token::NUMBER || token.type == Token::VARIABLE || token.type == Token::PI) {
+    if (token.type >= 8 && token.type <= 10) {
+        token.links = nullptr;
+        token.rechts = nullptr;
         return new Token(token);
     }
-    else if (token.type == 0 || token.type == 1 || token.type == 2 || token.type == 3 || token.type == 4) {
+    else if (token.type >= 0 && token.type <= 4) {
         huidigTokenIndex++;
         Token* temp1 = maakBoom(tokens[huidigTokenIndex]);
         token.links = temp1;
@@ -129,7 +154,7 @@ Token* binaireBoom::maakBoom(Token token) {
 
         return new Token(token);
     }
-    else if (token.type == 5 || token.type == 6 || token.type == 7) {
+    else if (token.type >= 5 && token.type <= 7) {
         huidigTokenIndex++;
         Token* temp3 = maakBoom(tokens[huidigTokenIndex]);
         token.links = temp3;
@@ -137,28 +162,31 @@ Token* binaireBoom::maakBoom(Token token) {
         return new Token(token);
     }
 
+    delete token.links;
+    delete token.rechts;
+
     return new Token(token);
 }
 
 void binaireBoom::printIO(Token* huidigeRoot) {
 
-    if (huidigeRoot == nullptr) {
+    if(huidigeRoot == nullptr){
         return;
     }
 
-    if(huidigeRoot->type == 5)
-    {
+
+    if(huidigeRoot->type >= 5 && huidigeRoot->type <= 7){ // sin cos tan als eerst printen
         std::cout << enumToString(huidigeRoot->type) << "(";
 
     }
-    if (huidigeRoot->type >= 0 && huidigeRoot->type <= 4 && huidigeRoot!=begin) {
+    if (huidigeRoot->type >= 0 && huidigeRoot->type <= 4 && huidigeRoot!=begin){
         std::cout << "(";
     }
-    // Traverse the left subtree (links)
 
+    // naar linker node
     printIO(huidigeRoot->links);
 
-    // Print the current node's value (assuming Token has a value field)
+    // print the token
     if(huidigeRoot->type == 9){
         std::cout << huidigeRoot->number;
 
@@ -167,23 +195,152 @@ void binaireBoom::printIO(Token* huidigeRoot) {
         std::cout << huidigeRoot->variable;
     }
     else{
-        if(huidigeRoot->type != 5){
+        if(huidigeRoot->type < 5 || huidigeRoot->type > 7){
             std::cout << enumToString(huidigeRoot->type);
         }
     }
 
-    // Traverse the right subtree (rechts)
+    // naar rechter node
     printIO(huidigeRoot->rechts);
 
-    // begin->type == 9 || begin->type == 10 || 
-    if (huidigeRoot->type >= 0 && huidigeRoot->type <= 4 && huidigeRoot!=begin) {
+    if(huidigeRoot->type >= 0 && huidigeRoot->type <= 4 && huidigeRoot!=begin){
         std::cout << ")";
     }
-
-    if(huidigeRoot->type == 5 || huidigeRoot->type == 6 || huidigeRoot->type == 7)//sin cos tan
-    {
+    if(huidigeRoot->type >= 5 && huidigeRoot->type <= 7){ // sin cos tan altijd haakje dicht
         std::cout << ")";
 
+    }
+
+}
+
+void  binaireBoom::printDOT(const std::string& uitvoerNaam){
+    std::ofstream dotFile(uitvoerNaam);
+
+    if(!dotFile){
+        std::cerr << "Kan niet wegschrijven!" << std::endl;
+        return;
+    }
+
+    dotFile << "digraph G {\n" << std::endl;
+    printHelpDOT(begin, dotFile);
+    dotFile << "}\n";
+
+    dotFile.close();
+
+}
+
+void binaireBoom::printHelpDOT(Token* token, std::ofstream& dotFile){
+    if (!token){
+        return;
+    }
+
+    int telHuidig = telDOT++;
+    int telLinks;
+    int telRechts;
+
+    if(token->links){
+        telLinks = telDOT;
+        // huidig
+        dotFile << telHuidig << "  [label = \" "<< plaatsToken(token) <<  " \" ]" <<  std::endl;
+        //links 
+        dotFile << telLinks << "  [label = \" "<< plaatsToken(token->links) <<  " \" ]" << std::endl;
+        dotFile << telHuidig << " -> " << telLinks  << std::endl;
+        printHelpDOT(token->links, dotFile);
+    }
+    if(token->rechts){
+        telRechts = telDOT;
+        dotFile << telRechts << "   [label = \" "<< plaatsToken(token->rechts) <<  " \" ]" << std::endl;
+        dotFile << telHuidig << " -> " << telRechts  << std::endl;
+        printHelpDOT(token->rechts, dotFile);
     }
 }
 
+std::string binaireBoom::plaatsToken(Token* token){
+    if (!token) return "";
+
+    if (token->type == Token::NUMBER) {
+        // haalt de extra decimalen weg
+        std::string nummer = std::to_string(token->number);
+        // als . gevonden checken of laaste kar een 0 is of een . zo ja dan weg halen 
+        while (nummer.find('.') != std::string::npos && (nummer.back() == '0' || nummer.back() == '.')) {
+            nummer.pop_back();
+        }
+        return nummer;
+    }
+     else if (token->type == Token::VARIABLE) {
+        return std::string(1, token->variable);
+    } else {
+        return enumToString(token->type);
+    }
+
+}
+
+
+Token* binaireBoom::vereenvoudig(Token* token){
+    if (!token){
+        return nullptr;
+    }
+
+    if (token->type == Token::NUMBER || token->type == Token::VARIABLE){
+        return token;
+    }
+
+    // eerst links en rechts vereenvoudigen 
+    token->links = vereenvoudig(token->rechts);
+    token->rechts = vereenvoudig(token->rechts);
+
+    // E + 0 = E || E - 0 = E ||
+    if (token->type == Token::PLUS || token->type == Token::MINUS) {
+        if (token->links->type == Token::NUMBER && token->links->number == 0){
+            return token->rechts;
+        }
+        if (token->rechts->type == Token::NUMBER && token->rechts->number == 0){
+            return token->links;
+        }
+    }
+
+    // E * 0 = E|| E * 1 = E
+    if (token->type == Token::TIMES ) {
+        if (token->links->type == Token::NUMBER && token->links->number == 0){
+            return token->links;
+        }
+        else if (token->links->type == Token::NUMBER && token->links->number == 1){
+            return token->rechts;
+        }
+
+        if (token->rechts->type == Token::NUMBER && token->rechts->number == 0){
+            return token->rechts;
+        }
+        else if (token->links->type == Token::NUMBER && token->links->number == 1){
+            return token->links;
+        }
+    }
+
+    // E^0 = 1 && E^1 = E
+    if (token->type == Token::POWER) {
+
+        if (token->rechts->type == Token::NUMBER && token->rechts->number == 0){
+            token->type = Token::NUMBER;
+            token->number = 1;
+
+            delete token->links;
+            delete token->rechts;
+            token->links = nullptr;
+            token->rechts = nullptr;
+
+            return token;
+        }
+
+        if (token->rechts->type == Token::NUMBER && token->rechts->number == 1){
+        
+            delete token->links;
+            delete token->rechts;
+            token->links = nullptr;
+            token->rechts = nullptr;
+
+            return token;
+        }
+    }
+
+    return token;
+}
