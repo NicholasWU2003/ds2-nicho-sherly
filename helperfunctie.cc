@@ -85,7 +85,7 @@ binaireBoom::binaireBoom(std::string invoerNaam){
     huidigTokenIndex = 0;
     telDOT = 1;
 
-    for(const std::string element : invoer){
+    for(const std::string &element : invoer){
         if(!maakToken(element))
         {
             std::cout << "klopt niet" << std::endl;
@@ -173,7 +173,6 @@ Token* binaireBoom::maakBoom(Token token) {
 
 void binaireBoom::printIOCall(){
 
-    std::cout << "Inorder Traversal: " << std::endl;
     if(begin != nullptr){
         printIO(begin);
 
@@ -228,10 +227,7 @@ void binaireBoom::printIO(Token* huidigeRoot){
 
 }
 
-void binaireBoom::printDOTCall(){
-    printDOT("testFile.dot");
 
-}
 
 void  binaireBoom::printDOT(const std::string& uitvoerNaam){
     std::ofstream dotFile(uitvoerNaam);

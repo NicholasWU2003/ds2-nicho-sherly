@@ -24,7 +24,7 @@
 // 
 
 int main(){
-  
+        std::string bestandsnaam;
         std::string invoerNaam;
         std::cout << "Geef de naam van het bestand: " << std::endl;
         binaireBoom boom("test.txt");
@@ -37,7 +37,7 @@ int main(){
             switch (keuze){
                 case 'e':
                 case 'E':
-                    // boom = binaireBoom("test.txt");
+                    boom = binaireBoom("test.txt");
                     break;
                 case 'p':
                 case 'P':
@@ -45,6 +45,9 @@ int main(){
                     break;
                 case 'd':
                 case 'D':
+                    std::cout << "geef de bestandsnaam; ";
+                    std::cin >> bestandsnaam;
+                    boom.printDOT(bestandsnaam);
                     break;
                 case 'n':
                 case 'N':
