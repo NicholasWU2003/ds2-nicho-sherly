@@ -38,10 +38,10 @@ class binaireBoom{
         ~binaireBoom();
         void verwijderBoom(Token* token);
         std::string enumToString(int type);
-        void maakBoomCall(std::string invoerNaam);
+        void maakBoomCall(std::string formule);
         Token* maakBoom(Token token);
         bool maakToken(std::string karakter);
-        std::vector<std::string> leesIn(std::string invoerNaam);
+        std::vector<std::string> leesIn(std::string formule);
         void printIOCall();
         void printIO(Token* token);
         void printDOT(const std::string& uitvoerNaam);

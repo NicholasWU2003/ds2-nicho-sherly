@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <vector>
 #include "helperfunctie.h"
 
@@ -24,36 +25,35 @@
 // 
 
 int main(){
-        std::string bestandsnaam;
-        std::string invoerNaam;
-        
-        binaireBoom boom;
         bool menu = true;
-        char keuze = ' ';
+        std::string bestandsnaam;
+        std::string uitvoer;
+        std::string formule;
+        std::string keuze;
+        binaireBoom boom;
+        
+        while (menu){
+            std::cout << std::endl
+            << "Kies een optie:" << std::endl
+            << "* exp <expressie>" << std::endl
+            << "* print " << std::endl
+            << "* dot <bestandsnaam>" << std::endl
+            << "* end " << std::endl << std:: endl;
 
-        while(menu){
-            std::cout << "[E]xp [P]rint [D]ot e[N]d" << std::endl;
-            std::cin >> keuze;
-            switch (keuze){
-                case 'e':
-                case 'E':
-                    std::cout << "Geef de naam van het bestand: " << std::endl;
-                    std::cin >> invoerNaam;
-                    boom.maakBoomCall(invoerNaam);
-                    break;
-                case 'p':
-                case 'P':
-                    boom.printIOCall();
-                    break;
-                case 'd':
-                case 'D':
-                    std::cout << "geef de bestandsnaam; ";
-                    std::cin >> bestandsnaam;
-                    boom.printDOT(bestandsnaam);
-                    break;
-                case 'n':
-                case 'N':
-                    menu = false;
+            std::getline(std::cin, keuze);
+
+            if (keuze.substr(0, 4) == "exp "){
+                formule = keuze.substr(5);
+                boom.maakBoomCall(formule);
+            }else if (keuze == "print"){
+                boom.printIOCall();
+            }else if (keuze.substr(0, 4) == "dot "){
+                uitvoer = keuze.substr(5);
+                boom.printDOT(uitvoer);
+            }else if( keuze == "end"){
+                menu = false;
+            }else{
+                std::cout << "Ongeldige instructie, probeer nog eens." << std::endl;
             }
         }
 

@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <sstream>
 #include "helperfunctie.h"
 
 std::string binaireBoom::enumToString(int type){
@@ -120,31 +121,23 @@ void binaireBoom::verwijderBoom(Token* token){
 
 }
  
-std::vector<std::string> binaireBoom::leesIn(std::string invoerNaam){
-    std::ifstream invoer;
+std::vector<std::string> binaireBoom::leesIn(std::string formule){
     std::string huidig;
     std::vector<std::string> lijstje;
+    std::stringstream invoer(formule);
     
-    invoer.open(invoerNaam, std::ios::in);
-    if (!invoer.is_open()){
-        std::cout << std::endl << "Gegeven bestand is niet gevonden." << std::endl;
-        return(lijstje);
-    }
-
     while (invoer >> huidig){
         lijstje.push_back(huidig);
     }
-
-    invoer.close();
 
     return(lijstje);
     
 }
 
-void binaireBoom::maakBoomCall(std::string invoerNaam){
+void binaireBoom::maakBoomCall(std::string formule){
     tokens.clear();
 
-    std::vector<std::string> invoer = leesIn(invoerNaam);
+    std::vector<std::string> invoer = leesIn(formule);
     huidigTokenIndex = 0;
     telDOT = 1;
 
