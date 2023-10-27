@@ -79,31 +79,33 @@ binaireBoom::binaireBoom(){
 }
 
 
-binaireBoom::binaireBoom(std::string invoerNaam){
+// binaireBoom::binaireBoom(std::string invoerNaam){
     
-    std::vector<std::string> invoer = leesIn(invoerNaam);
-    huidigTokenIndex = 0;
-    telDOT = 1;
+//     std::vector<std::string> invoer = leesIn(invoerNaam);
+//     huidigTokenIndex = 0;
+//     telDOT = 1;
 
-    for(const std::string &element : invoer){
-        if(!maakToken(element))
-        {
-            std::cout << "klopt niet" << std::endl;
+//     for(const std::string &element : invoer){
+//         if(!maakToken(element))
+//         {
+//             std::cout << "klopt niet" << std::endl;
+//         }
+//     }
+
+//     Token* temp = maakBoom(tokens[huidigTokenIndex]);
+//     begin = temp;
+
+//     // std::cout << "begin type: " << begin->type << std::endl;
+    
+// }
+
+binaireBoom::~binaireBoom(){
+    if(!tokenPtrs.empty()){
+        for(Token* huidig:tokenPtrs){
+            verwijderBoom(huidig);
         }
     }
 
-    Token* temp = maakBoom(tokens[huidigTokenIndex]);
-    begin = temp;
-
-    std::cout << "begin type: " << begin->type << std::endl;
-    
-}
-
-binaireBoom::~binaireBoom(){
-    if(begin != nullptr){
-        verwijderBoom(begin);
-
-    }
 }
 
 void binaireBoom::verwijderBoom(Token* token){
@@ -139,15 +141,34 @@ std::vector<std::string> binaireBoom::leesIn(std::string invoerNaam){
     
 }
 
-Token* binaireBoom::maakBoom(Token token) {
+void binaireBoom::maakBoomCall(std::string invoerNaam){
+    tokens.clear();
 
-    if (token.type >= 8 && token.type <= 10) {
+    std::vector<std::string> invoer = leesIn(invoerNaam);
+    huidigTokenIndex = 0;
+    telDOT = 1;
+
+    for(const std::string &element : invoer){
+        if(!maakToken(element))
+        {
+            std::cout << "klopt niet" << std::endl;
+        }
+    }
+
+    Token* temp = maakBoom(tokens[huidigTokenIndex]);
+    begin = temp;
+    tokenPtrs.push_back(begin);
+}
+
+Token* binaireBoom::maakBoom(Token token){
+
+    if (token.type >= 8 && token.type <= 10){
         token.links = nullptr;
         token.rechts = nullptr;
 
         return new Token(token);
     }
-    else if (token.type >= 0 && token.type <= 4) {
+    else if (token.type >= 0 && token.type <= 4){
         huidigTokenIndex++;
         Token* temp1 = maakBoom(tokens[huidigTokenIndex]);
         token.links = temp1;
@@ -158,7 +179,7 @@ Token* binaireBoom::maakBoom(Token token) {
 
         return new Token(token);
     }
-    else if (token.type >= 5 && token.type <= 7) {
+    else if (token.type >= 5 && token.type <= 7){
         huidigTokenIndex++;
         Token* temp3 = maakBoom(tokens[huidigTokenIndex]);
         token.links = temp3;
@@ -194,7 +215,7 @@ void binaireBoom::printIO(Token* huidigeRoot){
         std::cout << enumToString(huidigeRoot->type) << "(";
 
     }
-    if (huidigeRoot->type >= 0 && huidigeRoot->type <= 4 && huidigeRoot!=begin){
+    else if(huidigeRoot->type >= 0 && huidigeRoot->type <= 4 && huidigeRoot!=begin){
         std::cout << "(";
     }
 
@@ -220,9 +241,8 @@ void binaireBoom::printIO(Token* huidigeRoot){
     if(huidigeRoot->type >= 0 && huidigeRoot->type <= 4 && huidigeRoot!=begin){
         std::cout << ")";
     }
-    if(huidigeRoot->type >= 5 && huidigeRoot->type <= 7){ // sin cos tan altijd haakje dicht
+    else if(huidigeRoot->type >= 5 && huidigeRoot->type <= 7){ // sin cos tan altijd haakje dicht
         std::cout << ")";
-
     }
 
 }

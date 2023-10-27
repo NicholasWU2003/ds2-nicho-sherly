@@ -26,8 +26,8 @@
 int main(){
         std::string bestandsnaam;
         std::string invoerNaam;
-        std::cout << "Geef de naam van het bestand: " << std::endl;
-        binaireBoom boom("test.txt");
+        
+        binaireBoom boom;
         bool menu = true;
         char keuze = ' ';
 
@@ -37,7 +37,9 @@ int main(){
             switch (keuze){
                 case 'e':
                 case 'E':
-                    boom = binaireBoom("test.txt");
+                    std::cout << "Geef de naam van het bestand: " << std::endl;
+                    std::cin >> invoerNaam;
+                    boom.maakBoomCall(invoerNaam);
                     break;
                 case 'p':
                 case 'P':
