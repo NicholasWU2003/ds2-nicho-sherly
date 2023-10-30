@@ -49,6 +49,7 @@ class binaireBoom{
         std::string plaatsToken(Token* token);
 
         Token* vereenvoudig(Token* token);
+        void vereenvoudigCall();
 
 
 

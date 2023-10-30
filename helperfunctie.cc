@@ -304,7 +304,6 @@ std::string binaireBoom::plaatsToken(Token* token){
 
 }
 
-
 Token* binaireBoom::vereenvoudig(Token* token){
     if (!token){
         return nullptr;
@@ -315,20 +314,58 @@ Token* binaireBoom::vereenvoudig(Token* token){
     }
 
     // eerst links en rechts vereenvoudigen 
-    token->links = vereenvoudig(token->rechts);
+    token->links = vereenvoudig(token->links);
     token->rechts = vereenvoudig(token->rechts);
 
     // E + 0 = E || E - 0 = E ||
     if (token->type == Token::PLUS || token->type == Token::MINUS) {
-        if (token->links->type == Token::NUMBER && token->links->number == 0){
-            return token->rechts;
+        if (token->rechts->number == 0){
+
+            //dit kan een functie worden?
+            token->type = token->links->type; // links wordt token
+            token->number = token->links->number;
+            token->variable = token->links->variable;
+
+            Token* kinderenLinks = token->links->links; // bewaar de kinderen van links
+            Token* kinderenRechts = token->links->rechts; 
+            
+            delete token->rechts; // verwijdert 0
+            
+            token->links = kinderenLinks; // slaat kinderen op
+            token->rechts = kinderenRechts; 
+                
+            delete token->links; //verwijdert links  
+            return token;
+            
+            
         }
-        if (token->rechts->type == Token::NUMBER && token->rechts->number == 0){
-            return token->links;
+        //0 + E || 
+        if (token->links->number == 0 && token->type == Token::PLUS){
+
+            token->type = token->rechts->type; // rechts wordt token
+            token->number = token->rechts->number;
+            token->variable = token->rechts->variable;
+
+            Token* kinderenLinks = token->rechts->links; // bewaar de kinderen van rechts
+            Token* kinderenRechts = token->rechts->rechts; 
+            
+            delete token->links; // verwijdert 0
+            
+            token->links = kinderenLinks; // slaat kinderen op
+            token->rechts = kinderenRechts; 
+                
+            delete token->rechts; //verwijdert links  
+
+
+            return token;
+
+            
         }
+
+        
     }
 
-    // E * 0 = E|| E * 1 = E
+    // E * 0 = 0|| E * 1 = E
     if (token->type == Token::TIMES ) {
         if (token->links->type == Token::NUMBER && token->links->number == 0){
             return token->links;
@@ -371,5 +408,37 @@ Token* binaireBoom::vereenvoudig(Token* token){
         }
     }
 
+    // x - x = 0&&| x / x = 1
+    if (token->type == Token::MINUS || token->type == Token::DIVIDE ){
+        if (token->links->type == Token::VARIABLE && token->rechts->type == Token::VARIABLE){
+            if (token->links == token->rechts){
+                token->type = Token::NUMBER;
+                if (token->type == Token::MINUS){
+                    token->number = 0;
+                } else {
+                    token->number = 1;
+                }
+
+                delete token->links;
+                delete token->rechts;
+                token->links = nullptr;
+                token->rechts = nullptr;
+
+                return token;
+            }
+        }
+    }
+
     return token;
+}
+
+void binaireBoom::vereenvoudigCall(){
+    if(begin != nullptr){
+        vereenvoudig(begin);
+
+    }
+    else{
+        std::cout << "There is no tree";
+    }
+    std::cout << std::endl;
 }
