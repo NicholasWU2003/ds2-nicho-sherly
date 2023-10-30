@@ -47,8 +47,8 @@ class binaireBoom{
         void printDOT(const std::string& uitvoerNaam);
         void printHelpDOT(Token* begin,std::ofstream& wegschrijven);
         std::string plaatsToken(Token* token);
-
         Token* vereenvoudig(Token* token);
+        Token* simplify(Token* token);
         void vereenvoudigCall();
 
 
