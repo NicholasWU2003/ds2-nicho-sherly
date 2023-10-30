@@ -60,10 +60,9 @@ int main(){
                 waarde = std::stod(keuze.substr(5));
                 boom.evalCall(waarde);
             }else if( keuze == "diff"){
-                std::cout<<"nog niet geimplementeerd" << std::endl;
+                boom.diffCall();
             }else if( keuze == "simp"){
                 boom.vereenvoudigCall();
-
             }else if( keuze == "end"){
                 menu = false;
             }else{

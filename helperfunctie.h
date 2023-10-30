@@ -52,6 +52,8 @@ class binaireBoom{
         void evalueer(Token* token, double waarde);
         void evalCall(double waarde);
         Token* differentieer(Token* token);
+        bool bijnaGelijk(double a, double b);
+        void diffCall();
 
 
 
@@ -63,6 +65,7 @@ class binaireBoom{
         Token* begin;
         int huidigTokenIndex;
         int telDOT;
+        
 
 };
 

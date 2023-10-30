@@ -25,7 +25,7 @@ bool binaireBoom::maakToken(std::string kar){
     if (kar == "pi"){
         huidig.type = Token::PI;
         huidig.variable = 'p';
-        huidig.number = 3.141595;
+        huidig.number = 3.141592;
     }
     else if (kar == "sin"){
         huidig.type = Token::SINE;
@@ -393,25 +393,33 @@ Token* binaireBoom::simplify(Token* token) {
                 return token;
             }
         }
+        else{ // als delen door 0
+            std::cout << "delen door nul is flauwekul"<< std::endl
+            << " herschrijf de expressie "<< std::endl;
+        }
     }
     else if(token->type == Token::SINE){
-        if(token->links && token->links->type == Token::NUMBER){
-            // Simplify sin of a constant value
-            token->type = Token::NUMBER;
-            if (token->number == Token::PI){
-                    // 0 returnen
+        if(token->links && (token->links->type == Token::NUMBER || token->links->type == Token::PI)){
+            if (token->links->number == 0 || bijnaGelijk(token->links->number, 3.141592)){
+                token->type = Token::NUMBER;
+                token->number = 0;
+                delete token->links;
+                token->links = nullptr;
+                return token;
             }
-            token->number = sin(token->links->number);
-            delete token->links;
-            token->links = nullptr;
-            return token;
         }
     } 
     else if(token->type == Token::COSINE){
-        if(token->links && token->links->type == Token::NUMBER){
-            // Simplify cos of a constant value
-            token->type = Token::NUMBER;
-            token->number = cos(token->links->number);
+        if(token->links && (token->links->type == Token::NUMBER || token->links->type == Token::PI)){
+            if (token->links->number == 0){
+                token->type = Token::NUMBER;
+                token->number = 1;
+            }
+            else if(bijnaGelijk(token->links->number, 3.141592)){
+                token->type = Token::NUMBER;
+                token->number = -1;
+
+            }
             delete token->links;
             token->links = nullptr;
             return token;
@@ -419,36 +427,47 @@ Token* binaireBoom::simplify(Token* token) {
     } 
     else if(token->type == Token::TANGENT){
         if(token->links && token->links->type == Token::NUMBER){
-            // Simplify tan of a constant value
-            token->type = Token::NUMBER;
-            token->number = tan(token->links->number);
-            delete token->links;
-            token->links = nullptr;
-            return token;
+            if (token->links->number == 0 || bijnaGelijk(token->links->number, 3.141592)){
+                token->type = Token::NUMBER;
+                token->number = 0;
+                delete token->links;
+                token->links = nullptr;
+                return token;
+            }
         }
     }
-    // else if(token->type == Token::POWER){
-    //     if(token->rechts->type == Token::NUMBER && token->rechts->number == 0){
-    //         token->type = Token::NUMBER;
-    //         token->number = 1;
+    else if(token->type == Token::POWER){
+        if(token->rechts->type == Token::NUMBER && token->rechts->number == 0){
+            token->type = Token::NUMBER;
+            token->number = 1;
 
-    //         delete token->links;
-    //         delete token->rechts;
-    //         token->links = nullptr;
-    //         token->rechts = nullptr;
+            delete token->links;
+            delete token->rechts;
+            token->links = nullptr;
+            token->rechts = nullptr;
 
-    //         return token;
-    //     }
-    //     if(token->rechts->type == Token::NUMBER && token->rechts->number == 1){//ebe pebbe
-    //         std::cout << "hij komt hier in" << std::endl;
-    //         Token* hulp = token;
-    //         delete token->rechts;
-    //         token = token->links;
-    //         delete hulp;
+            return token;
+        }
+        if(token->rechts && token->rechts->type == Token::NUMBER && token->rechts->number == 1){
+
+            // Token* hulp = token->links;
+            // delete token->rechts;
+            // token->rechts = nullptr;
+            // token = hulp;
+            // delete hulp;
             
-    //         return token;
-    //     }
-    // }
+            // return token;
+// -------------------------------------
+            // Token* temp = token->links;
+            // token = temp;
+            // token->links = temp->links;
+            // token->rechts = temp->rechts;
+
+            // delete temp;
+            
+            // return token;
+        }
+    }
 
     // Return the token if no simplifications were applied
     return token;
@@ -494,31 +513,64 @@ void binaireBoom::evalueer(Token* token, double waarde){
 // |________|
 
 Token* binaireBoom::differentieer(Token* token) {
+    std::cout<<"diffcal"<<std::endl;
+    std::cout << "Token: " << token << std::endl;
+    if (!token){
+        return nullptr;
+    }
+
+    if (token->type == Token::NUMBER){//constante
+        std::cout<<"ik komhier 1" << std::endl;
+        Token* hulp = new Token();
+        hulp->type = Token::NUMBER;
+        hulp->number = 0;
+        return hulp;
+    }
+    if (token->type == Token::VARIABLE && token->variable == 'x'){//variabele
+        Token* hulp = new Token();
+        hulp->type = Token::NUMBER;
+        hulp->number = 1;
+        return hulp;
+    }
+    if (token->type == Token::VARIABLE && token->variable == 'x'){//variabele is x 
+        Token* hulp = new Token();
+        hulp->type = Token::NUMBER;
+        hulp->number = 1;
+        return hulp;
+    }
+    if (token->type == Token::VARIABLE && token->variable != 'x'){//variabele is niet x 
+        Token* hulp = new Token();
+        hulp->type = Token::NUMBER;
+        hulp->number = 0;
+        return hulp;
+    }
+    // if (token->type == Token::POWER){// macht met constante
+    //     token->links 
+    //     Token* hulp = new Token();
+    //     hulp->type = Token::NUMBER;
+    //     hulp->number = 1;
+    //     return hulp;
+    // }
+
+
 }
 
-// const double EPSILON = 1e-9;
-// bool AlmostEqual(double a, double b) {
-//     return std::abs(a - b) < EPSILON;
-// }
-// else if(token->type == Token::COSINE){
-//     if(token->links && token->links->type == Token::NUMBER){
-//         double val = token->links->number;
+void binaireBoom::diffCall()
+{
+    if(begin != nullptr){        
+        differentieer(begin);
+    }
+    else{
+        std::cout << "There is no tree";
+    }
+    std::cout << std::endl;
+}
 
-//         // Simplify cos of some known constant values
-//         if (AlmostEqual(val, 0) || AlmostEqual(val, 2 * M_PI)) { // M_PI is from cmath for π
-//             token->number = 1;
-//         } 
-//         else if (AlmostEqual(val, M_PI)) {
-//             token->number = -1;
-//         } 
-//         else {
-//             // For other values
-//             token->number = cos(val);
-//         }
 
-//         token->type = Token::NUMBER;
-//         delete token->links;
-//         token->links = nullptr;
-//         return token;
-//     }
-// }
+
+
+bool binaireBoom::bijnaGelijk(double a, double b) {
+    const double EPSILON = 1e-9;
+    return std::abs(a - b) < EPSILON;
+}
+
