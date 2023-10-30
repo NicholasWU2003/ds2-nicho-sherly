@@ -317,116 +317,9 @@ Token* binaireBoom::vereenvoudig(Token* token){
     token->links = vereenvoudig(token->links);
     token->rechts = vereenvoudig(token->rechts);
 
-    // E + 0 = E || E - 0 = E ||
-    if (token->type == Token::PLUS || token->type == Token::MINUS) {
-        if(token->rechts->type == Token::NUMBER){
-            if (token->rechts->number == 0){
-                //dit kan een functie worden?
-                token->type = token->links->type; // links wordt token
-                token->number = token->links->number;
-                token->variable = token->links->variable;
 
-                Token* kinderenLinks = token->links->links; // bewaar de kinderen van links
-                Token* kinderenRechts = token->links->rechts; 
-                
-                delete token->rechts; // verwijdert 0
-                
-                token->links = kinderenLinks; // slaat kinderen op
-                token->rechts = kinderenRechts; 
-                    
-                delete token->links; //verwijdert links  
-                return token;
-        
-            }
-        }
-        //0 + E || 
-        if (token->links->number == 0 && token->type == Token::PLUS){
-
-            token->type = token->rechts->type; // rechts wordt token
-            token->number = token->rechts->number;
-            token->variable = token->rechts->variable;
-
-            Token* kinderenLinks = token->rechts->links; // bewaar de kinderen van rechts
-            Token* kinderenRechts = token->rechts->rechts; 
-            
-            delete token->links; // verwijdert 0
-            
-            token->links = kinderenLinks; // slaat kinderen op
-            token->rechts = kinderenRechts; 
-                
-            delete token->rechts; //verwijdert links  
-
-
-            return token;
-
-            
-        }
-
-    }
-    // E * 0 = 0 || E * 1 = E
-    else if (token->type == Token::TIMES ) {
-        if (token->links->number == 0){
-            token->type = Token::NUMBER;
-            token->number = 0;
-
-            token->links = nullptr;
-            token->rechts = nullptr;
-            delete token->links;
-            delete token->rechts;
-
-            return token;
-        }
-        else if (token->links->number == 1){
-
-            token->type = token->rechts->type; // rechts wordt token
-            token->number = token->rechts->number;
-            token->variable = token->rechts->variable;
-
-            Token* kinderenLinks = token->rechts->links; // bewaar de kinderen van rechts
-            Token* kinderenRechts = token->rechts->rechts; 
-            
-            delete token->links; // verwijdert 0
-            
-            token->links = kinderenLinks; // slaat kinderen op
-            token->rechts = kinderenRechts; 
-                
-            delete token->rechts; //verwijdert links  
-
-
-            return token;
-        }
-
-        if (token->rechts->number == 0){
-            token->type = Token::NUMBER;
-            token->number = 0;
-
-            token->links = nullptr;
-            token->rechts = nullptr;
-            delete token->links;
-            delete token->rechts;
-    
-            return token;
-        }
-        else if (token->rechts->number == 1){
-            token->type = token->links->type; // rechts wordt token
-            token->number = token->links->number;
-            token->variable = token->links->variable;
-
-            Token* kinderenLinks = token->links->links; // bewaar de kinderen van rechts
-            Token* kinderenRechts = token->links->rechts; 
-            
-            delete token->rechts; // verwijdert 0
-            
-            token->links = kinderenLinks; // slaat kinderen op
-            token->rechts = kinderenRechts; 
-                
-            delete token->links; //verwijdert links  
-
-            return token;
-        }
-    }
     // E^0 = 1 && E^1 = E
-    else if (token->type == Token::POWER) {
+    if (token->type == Token::POWER) {
 
         if (token->rechts->type == Token::NUMBER && token->rechts->number == 0){
             token->type = Token::NUMBER;
@@ -440,28 +333,26 @@ Token* binaireBoom::vereenvoudig(Token* token){
             return token;
         }
 
-        if (token->rechts->type == Token::NUMBER && token->rechts->number == 1){
-        
-            delete token->links;
+        if (token->rechts->type == Token::NUMBER && token->rechts->number == 1){//ebe pebbe
+            std::cout << "hij komt hier in" << std::endl;
+            Token* hulp = token;
             delete token->rechts;
-            token->links = nullptr;
-            token->rechts = nullptr;
-
+            token = token->links;
+            delete hulp;
+            
             return token;
         }
     }
-    // x - x = 0&& x / x = 1
-    else if (token->type == Token::MINUS || token->type == Token::DIVIDE ){
+    // x - x = 0 && x / x = 1
+    if (token->type == Token::MINUS || token->type == Token::DIVIDE ){
         if (token->links->type == Token::VARIABLE && token->rechts->type == Token::VARIABLE){
             if (token->links->variable == token->rechts->variable){
 
-        
-
                 if (token->type == Token::MINUS){
-                    
-                    token->type = Token::NUMBER;  // Set the type to number once
+                    token->type = Token::NUMBER;  
                     token->number = 0;  
                 } else {
+                    token->type = Token::NUMBER;  
                     token->number = 1;
                 }
 
@@ -478,74 +369,72 @@ Token* binaireBoom::vereenvoudig(Token* token){
     return token;
 }
 
-// Token* binaireBoom::simplify(Token* token) {
-//     std::cout << "Dit is simplify" << std::endl;
-//     if (!token) {
-//         std::cout << "7hij komt hier in" << std::endl;
-//         return nullptr;
-//     }
+Token* binaireBoom::simplify(Token* token) {
+    if (!token) {
+        return nullptr;
+    }
 
-//     // Recursively simplify the left and right subtrees
-//     token->links = simplify(token->links);
-//     token->rechts = simplify(token->rechts);
+    // Recursively simplify the left and right subtrees
+    token->links = simplify(token->links);
+    token->rechts = simplify(token->rechts);
 
-//     // Simplification rules go here
-//     if (token->type == Token::PLUS) {
-//         // Simplify addition
-//         if (token->links && token->links->type == Token::NUMBER && token->links->number == 0) {
-//             std::cout << "1hij komt hier in" << std::endl;
-//             delete token->links;
-//             return token->rechts;
-//         }
-//         if (token->rechts && token->rechts->type == Token::NUMBER && token->rechts->number == 0) {
-//             std::cout << "2hij komt hier in" << std::endl;
-//             delete token->rechts;
-//             return token->links;
-//         }
-//     } else if (token->type == Token::TIMES) {
-//         // Simplify multiplication
-//         if (token->links && token->links->type == Token::NUMBER && token->links->number == 0) {
-//             std::cout << "3hij komt hier in" << std::endl;
-//             delete token->links;
-//             delete token->rechts;
-//             token->links = nullptr;
-//             token->rechts = nullptr;
-//             token->type = Token::NUMBER;
-//             token->number = 0;
-//             return token;
-//         }
-//         if (token->rechts && token->rechts->type == Token::NUMBER && token->rechts->number == 0) {
-//             std::cout << "4hij komt hier in" << std::endl;
-//             delete token->links;
-//             delete token->rechts;
-//             token->links = nullptr;
-//             token->rechts = nullptr;
-//             token->type = Token::NUMBER;
-//             token->number = 0;
-//             return token;
-//         }
-//         if (token->links && token->links->type == Token::NUMBER && token->links->number == 1) {
-//             std::cout << "5hij komt hier in" << std::endl;
-//             delete token->links;
-//             return token->rechts;
-//         }
-//         if (token->rechts && token->rechts->type == Token::NUMBER && token->rechts->number == 1) {
-//             std::cout << "6hij komt hier in" << std::endl;
-//             delete token->rechts;
-//             return token->links;
-//         }
-//     }
+    // Simplification rules go here
+    if (token->type == Token::PLUS) {
+        if (token->links && token->links->type == Token::NUMBER &&
+            token->rechts && token->rechts->type == Token::NUMBER) {
+            // Simplify addition of two constants
+            token->number = token->links->number + token->rechts->number;
+            delete token->links;
+            delete token->rechts;
+            token->links = nullptr;
+            token->rechts = nullptr;
+            token->type = Token::NUMBER;
+        }
+    } else if (token->type == Token::MINUS) {
+        if (token->links && token->links->type == Token::NUMBER &&
+            token->rechts && token->rechts->type == Token::NUMBER) {
+            // Simplify subtraction of two constants
+            token->number = token->links->number - token->rechts->number;
+            delete token->links;
+            delete token->rechts;
+            token->links = nullptr;
+            token->rechts = nullptr;
+            token->type = Token::NUMBER;
+        }
+    } else if (token->type == Token::TIMES) {
+        if (token->links && token->links->type == Token::NUMBER &&
+            token->rechts && token->rechts->type == Token::NUMBER) {
+            // Simplify multiplication of two constants
+            token->number = token->links->number * token->rechts->number;
+            delete token->links;
+            delete token->rechts;
+            token->links = nullptr;
+            token->rechts = nullptr;
+            token->type = Token::NUMBER;
+        }
+    } else if (token->type == Token::DIVIDE) {
+        if (token->links && token->links->type == Token::NUMBER &&
+            token->rechts && token->rechts->type == Token::NUMBER && token->rechts->number != 0) {
+            // Simplify division of two constants (excluding division by zero)
+            token->number = token->links->number / token->rechts->number;
+            delete token->links;
+            delete token->rechts;
+            token->links = nullptr;
+            token->rechts = nullptr;
+            token->type = Token::NUMBER;
+        }
+    }
 
-//     // Return the token if no simplifications were applied
-//     return token;
-// }
+    // Return the token if no simplifications were applied
+    return token;
+}
 
 
 void binaireBoom::vereenvoudigCall(){
     if(begin != nullptr){
         vereenvoudig(begin);
         
-        simplify(begin);
+        // simplify(begin);
 
     }
     else{
