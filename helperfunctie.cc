@@ -22,9 +22,10 @@ std::string binaireBoom::enumToString(int type){
 bool binaireBoom::maakToken(std::string kar){
     struct Token huidig;
 
-    if (kar == "p"){
+    if (kar == "pi"){
         huidig.type = Token::PI;
         huidig.variable = 'p';
+        huidig.number = 3.141595;
     }
     else if (kar == "sin"){
         huidig.type = Token::SINE;
@@ -71,14 +72,12 @@ bool binaireBoom::maakToken(std::string kar){
     return true;
 }
 
-
 binaireBoom::binaireBoom(){
     begin = nullptr;
     telDOT = 1;
     huidigTokenIndex = 0;
 
 }
-
 
 // binaireBoom::binaireBoom(std::string invoerNaam){
     
@@ -304,73 +303,8 @@ std::string binaireBoom::plaatsToken(Token* token){
 
 }
 
-Token* binaireBoom::vereenvoudig(Token* token){
-    if (!token){
-        return nullptr;
-    }
-
-    if (token->type == Token::NUMBER || token->type == Token::VARIABLE){
-        return token;
-    }
-
-    // eerst links en rechts vereenvoudigen 
-    token->links = vereenvoudig(token->links);
-    token->rechts = vereenvoudig(token->rechts);
-
-
-    // E^0 = 1 && E^1 = E
-    if (token->type == Token::POWER) {
-
-        if (token->rechts->type == Token::NUMBER && token->rechts->number == 0){
-            token->type = Token::NUMBER;
-            token->number = 1;
-
-            delete token->links;
-            delete token->rechts;
-            token->links = nullptr;
-            token->rechts = nullptr;
-
-            return token;
-        }
-
-        if (token->rechts->type == Token::NUMBER && token->rechts->number == 1){//ebe pebbe
-            std::cout << "hij komt hier in" << std::endl;
-            Token* hulp = token;
-            delete token->rechts;
-            token = token->links;
-            delete hulp;
-            
-            return token;
-        }
-    }
-    // x - x = 0 && x / x = 1
-    if (token->type == Token::MINUS || token->type == Token::DIVIDE ){
-        if (token->links->type == Token::VARIABLE && token->rechts->type == Token::VARIABLE){
-            if (token->links->variable == token->rechts->variable){
-
-                if (token->type == Token::MINUS){
-                    token->type = Token::NUMBER;  
-                    token->number = 0;  
-                } else {
-                    token->type = Token::NUMBER;  
-                    token->number = 1;
-                }
-
-                delete token->links;
-                delete token->rechts;
-                token->links = nullptr;
-                token->rechts = nullptr;
-
-                return token;
-            }
-        }
-    }
-
-    return token;
-}
-
 Token* binaireBoom::simplify(Token* token) {
-    if (!token) {
+    if(!token){
         return nullptr;
     }
 
@@ -379,7 +313,7 @@ Token* binaireBoom::simplify(Token* token) {
     token->rechts = simplify(token->rechts);
 
     // Simplification rules go here
-    if (token->type == Token::PLUS) {
+    if(token->type == Token::PLUS){
         if (token->links && token->links->type == Token::NUMBER &&
             token->rechts && token->rechts->type == Token::NUMBER) {
             // Simplify addition of two constants
@@ -390,8 +324,9 @@ Token* binaireBoom::simplify(Token* token) {
             token->rechts = nullptr;
             token->type = Token::NUMBER;
         }
-    } else if (token->type == Token::MINUS) {
-        if (token->links && token->links->type == Token::NUMBER &&
+    }
+    else if (token->type == Token::MINUS){
+        if(token->links && token->links->type == Token::NUMBER &&
             token->rechts && token->rechts->type == Token::NUMBER) {
             // Simplify subtraction of two constants
             token->number = token->links->number - token->rechts->number;
@@ -401,9 +336,27 @@ Token* binaireBoom::simplify(Token* token) {
             token->rechts = nullptr;
             token->type = Token::NUMBER;
         }
-    } else if (token->type == Token::TIMES) {
-        if (token->links && token->links->type == Token::NUMBER &&
-            token->rechts && token->rechts->type == Token::NUMBER) {
+        else if(token->links->type == Token::VARIABLE && token->rechts->type == Token::VARIABLE){
+
+            if(token->links->variable == token->rechts->variable){
+
+                token->type = Token::NUMBER;  
+                token->number = 0;  
+                
+                delete token->links;
+                delete token->rechts;
+                token->links = nullptr;
+                token->rechts = nullptr;
+
+                return token;
+            }
+        }
+
+    }
+    else if(token->type == Token::TIMES){
+
+        if(token->links && token->links->type == Token::NUMBER &&
+            token->rechts && token->rechts->type == Token::NUMBER){
             // Simplify multiplication of two constants
             token->number = token->links->number * token->rechts->number;
             delete token->links;
@@ -412,9 +365,11 @@ Token* binaireBoom::simplify(Token* token) {
             token->rechts = nullptr;
             token->type = Token::NUMBER;
         }
-    } else if (token->type == Token::DIVIDE) {
-        if (token->links && token->links->type == Token::NUMBER &&
-            token->rechts && token->rechts->type == Token::NUMBER && token->rechts->number != 0) {
+    }
+    else if(token->type == Token::DIVIDE){
+        
+        if(token->links && token->links->type == Token::NUMBER &&
+            token->rechts && token->rechts->type == Token::NUMBER && token->rechts->number != 0){
             // Simplify division of two constants (excluding division by zero)
             token->number = token->links->number / token->rechts->number;
             delete token->links;
@@ -423,7 +378,77 @@ Token* binaireBoom::simplify(Token* token) {
             token->rechts = nullptr;
             token->type = Token::NUMBER;
         }
+        else if(token->links->type == Token::VARIABLE && token->rechts->type == Token::VARIABLE){
+            
+            if(token->links->variable == token->rechts->variable){
+
+                token->type = Token::NUMBER;  
+                token->number = 1;
+            
+                delete token->links;
+                delete token->rechts;
+                token->links = nullptr;
+                token->rechts = nullptr;
+
+                return token;
+            }
+        }
     }
+    else if(token->type == Token::SINE){
+        if(token->links && token->links->type == Token::NUMBER){
+            // Simplify sin of a constant value
+            token->type = Token::NUMBER;
+            if (token->number == Token::PI){
+                    // 0 returnen
+            }
+            token->number = sin(token->links->number);
+            delete token->links;
+            token->links = nullptr;
+            return token;
+        }
+    } 
+    else if(token->type == Token::COSINE){
+        if(token->links && token->links->type == Token::NUMBER){
+            // Simplify cos of a constant value
+            token->type = Token::NUMBER;
+            token->number = cos(token->links->number);
+            delete token->links;
+            token->links = nullptr;
+            return token;
+        }
+    } 
+    else if(token->type == Token::TANGENT){
+        if(token->links && token->links->type == Token::NUMBER){
+            // Simplify tan of a constant value
+            token->type = Token::NUMBER;
+            token->number = tan(token->links->number);
+            delete token->links;
+            token->links = nullptr;
+            return token;
+        }
+    }
+    // else if(token->type == Token::POWER){
+    //     if(token->rechts->type == Token::NUMBER && token->rechts->number == 0){
+    //         token->type = Token::NUMBER;
+    //         token->number = 1;
+
+    //         delete token->links;
+    //         delete token->rechts;
+    //         token->links = nullptr;
+    //         token->rechts = nullptr;
+
+    //         return token;
+    //     }
+    //     if(token->rechts->type == Token::NUMBER && token->rechts->number == 1){//ebe pebbe
+    //         std::cout << "hij komt hier in" << std::endl;
+    //         Token* hulp = token;
+    //         delete token->rechts;
+    //         token = token->links;
+    //         delete hulp;
+            
+    //         return token;
+    //     }
+    // }
 
     // Return the token if no simplifications were applied
     return token;
@@ -431,14 +456,69 @@ Token* binaireBoom::simplify(Token* token) {
 
 
 void binaireBoom::vereenvoudigCall(){
-    if(begin != nullptr){
-        vereenvoudig(begin);
-        
-        // simplify(begin);
-
+    if(begin != nullptr){        
+        simplify(begin);
     }
     else{
         std::cout << "There is no tree";
     }
     std::cout << std::endl;
 }
+
+void binaireBoom::evalCall(double waarde){
+    if(begin != nullptr){        
+        evalueer(begin, waarde);
+        simplify(begin);
+    }
+    else{
+        std::cout << "There is no tree";
+    }
+    std::cout << std::endl;
+}
+
+void binaireBoom::evalueer(Token* token, double waarde){
+    if (!token) return;
+
+    if (token->type == Token::VARIABLE && token->variable == 'x') {
+        token->type = Token::NUMBER;
+        token->number = waarde;
+    }
+
+    evalueer(token->links, waarde);
+    evalueer(token->rechts, waarde);
+}
+
+//  ________  cursor parkeerplek
+// |        | 
+// |        |
+// |________|
+
+Token* binaireBoom::differentieer(Token* token) {
+}
+
+// const double EPSILON = 1e-9;
+// bool AlmostEqual(double a, double b) {
+//     return std::abs(a - b) < EPSILON;
+// }
+// else if(token->type == Token::COSINE){
+//     if(token->links && token->links->type == Token::NUMBER){
+//         double val = token->links->number;
+
+//         // Simplify cos of some known constant values
+//         if (AlmostEqual(val, 0) || AlmostEqual(val, 2 * M_PI)) { // M_PI is from cmath for π
+//             token->number = 1;
+//         } 
+//         else if (AlmostEqual(val, M_PI)) {
+//             token->number = -1;
+//         } 
+//         else {
+//             // For other values
+//             token->number = cos(val);
+//         }
+
+//         token->type = Token::NUMBER;
+//         delete token->links;
+//         token->links = nullptr;
+//         return token;
+//     }
+// }

@@ -30,7 +30,7 @@ int main(){
         std::string uitvoer;
         std::string formule;
         std::string keuze;
-        std::string waarde;
+        double waarde;
         binaireBoom boom;
 
         while (menu){
@@ -56,9 +56,9 @@ int main(){
             }else if (keuze.substr(0, 4) == "dot "){
                 uitvoer = keuze.substr(4);
                 boom.printDOT(uitvoer);
-            }else if( keuze.substr(0, 5) == "eval "){
-                std::cout<<"nog niet geimplementeerd" << std::endl;
-                // waarde = keuze.substr(6);
+            }else if(keuze.substr(0, 5) == "eval "){
+                waarde = std::stod(keuze.substr(5));
+                boom.evalCall(waarde);
             }else if( keuze == "diff"){
                 std::cout<<"nog niet geimplementeerd" << std::endl;
             }else if( keuze == "simp"){
