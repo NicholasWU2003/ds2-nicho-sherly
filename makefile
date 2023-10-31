@@ -8,7 +8,7 @@ CXXFLAGS = -Wall -std=c++11
 OBJS = main.o helperfunctie.o
 
 # Executable name
-TARGET = CA
+TARGET = DS
 
 $(TARGET): $(OBJS)
 	$(CXX) $(CXXFLAGS) -o $(TARGET) $(OBJS)

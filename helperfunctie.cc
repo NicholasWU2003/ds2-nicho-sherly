@@ -215,10 +215,10 @@ void binaireBoom::printIO(Token* huidigeRoot){
     printIO(huidigeRoot->links);
 
     // print the token
-    if(huidigeRoot->type == 9){
+    if(huidigeRoot->type == Token::NUMBER){
         std::cout << huidigeRoot->number;
     }
-    else if (huidigeRoot->type == 10){
+    else if (huidigeRoot->type == Token::VARIABLE){
         std::cout << huidigeRoot->variable;
     }
     else{
@@ -324,6 +324,19 @@ Token* binaireBoom::simplify(Token* token) {
             token->rechts = nullptr;
             token->type = Token::NUMBER;
         }
+        else if(token->links && token->rechts && 
+            ((token->links->type == Token::NUMBER && token->links->number == 0)||
+              (token->rechts->type == Token::NUMBER && token->rechts->number == 0))){
+            
+            if(token->links->type == Token::NUMBER && token->links->number == 0){
+                return token->rechts;
+            }
+            else{
+                return token->links;
+            }
+            
+        }
+
     }
     else if (token->type == Token::MINUS){
         if(token->links && token->links->type == Token::NUMBER &&
@@ -351,6 +364,13 @@ Token* binaireBoom::simplify(Token* token) {
                 return token;
             }
         }
+        else if(token->links && token->rechts && 
+                token->rechts->type == Token::NUMBER && token->rechts->number == 0){
+            
+            return token->links;
+            
+        }
+        
 
     }
     else if(token->type == Token::TIMES){
@@ -365,11 +385,36 @@ Token* binaireBoom::simplify(Token* token) {
             token->rechts = nullptr;
             token->type = Token::NUMBER;
         }
+        else if(token->links && token->rechts && 
+            ((token->links->type == Token::NUMBER && token->links->number == 0)||
+              (token->rechts->type == Token::NUMBER && token->rechts->number == 0))){
+            
+            token->type = Token::NUMBER;
+            token->number = 0;
+
+            delete token->links;
+            delete token->rechts;
+            token->links = nullptr;
+            token->rechts = nullptr;
+            
+        }
+        else if(token->links && token->rechts && 
+            ((token->links->type == Token::NUMBER && token->links->number == 1)||
+              (token->rechts->type == Token::NUMBER && token->rechts->number == 1))){
+            
+            if(token->links->type == Token::NUMBER && token->links->number == 1){
+                return token->rechts;
+            }
+            else{
+                return token->links;
+            }
+        }
     }
     else if(token->type == Token::DIVIDE){
         
         if(token->links && token->links->type == Token::NUMBER &&
-            token->rechts && token->rechts->type == Token::NUMBER && token->rechts->number != 0){
+            token->rechts && token->rechts->type == Token::NUMBER && 
+            token->rechts->number != 0){
             // Simplify division of two constants (excluding division by zero)
             token->number = token->links->number / token->rechts->number;
             delete token->links;
@@ -393,7 +438,7 @@ Token* binaireBoom::simplify(Token* token) {
                 return token;
             }
         }
-        else{ // als delen door 0
+        else if(token->rechts->type == Token::NUMBER && token->rechts->number == 0){ // als delen door 0
             std::cout << "delen door nul is flauwekul"<< std::endl
             << " herschrijf de expressie "<< std::endl;
         }
@@ -448,25 +493,29 @@ Token* binaireBoom::simplify(Token* token) {
 
             return token;
         }
-        if(token->rechts && token->rechts->type == Token::NUMBER && token->rechts->number == 1){
-
-            // Token* hulp = token->links;
-            // delete token->rechts;
-            // token->rechts = nullptr;
-            // token = hulp;
-            // delete hulp;
+        else if(token->rechts->type == Token::NUMBER && token->rechts->number == 1){
             
-            // return token;
-// -------------------------------------
-            // Token* temp = token->links;
-            // token = temp;
-            // token->links = temp->links;
-            // token->rechts = temp->rechts;
-
-            // delete temp;
-            
-            // return token;
+            return token->links;
         }
+        else if (token->links->type == Token::NUMBER && token->rechts->type == Token::NUMBER){
+            int base = token->links->number;
+            int exp = token->rechts->number;
+            int result = 1;
+
+            for (int i = 0; i < exp; i++){
+                result *= base;
+            }
+            token->type = Token::NUMBER;
+            token->number = result;
+
+            delete token->links;
+            delete token->rechts;
+            token->links = nullptr;
+            token->rechts = nullptr;
+
+            return token;   
+        }
+        
     }
 
     // Return the token if no simplifications were applied
@@ -476,7 +525,7 @@ Token* binaireBoom::simplify(Token* token) {
 
 void binaireBoom::vereenvoudigCall(){
     if(begin != nullptr){        
-        simplify(begin);
+        begin = simplify(begin);
     }
     else{
         std::cout << "There is no tree";
@@ -487,7 +536,7 @@ void binaireBoom::vereenvoudigCall(){
 void binaireBoom::evalCall(double waarde){
     if(begin != nullptr){        
         evalueer(begin, waarde);
-        simplify(begin);
+        begin = simplify(begin);
     }
     else{
         std::cout << "There is no tree";
@@ -507,67 +556,224 @@ void binaireBoom::evalueer(Token* token, double waarde){
     evalueer(token->rechts, waarde);
 }
 
-//  ________  cursor parkeerplek
-// |        | 
-// |        |
-// |________|
+// Token* binaireBoom::differentieer(Token* token) {
+    // if (!token){
+    //     return nullptr;
+    // }
 
-Token* binaireBoom::differentieer(Token* token) {
-    std::cout<<"diffcal"<<std::endl;
-    std::cout << "Token: " << token << std::endl;
-    if (!token){
-        return nullptr;
-    }
+    // Token* differentieerLeft = differentieer(token->links);
+    // Token* differentieerRight = differentieer(token->rechts);
 
-    if (token->type == Token::NUMBER){//constante
-        std::cout<<"ik komhier 1" << std::endl;
-        Token* hulp = new Token();
-        hulp->type = Token::NUMBER;
-        hulp->number = 0;
-        return hulp;
-    }
-    if (token->type == Token::VARIABLE && token->variable == 'x'){//variabele
-        Token* hulp = new Token();
-        hulp->type = Token::NUMBER;
-        hulp->number = 1;
-        return hulp;
-    }
-    if (token->type == Token::VARIABLE && token->variable == 'x'){//variabele is x 
-        Token* hulp = new Token();
-        hulp->type = Token::NUMBER;
-        hulp->number = 1;
-        return hulp;
-    }
-    if (token->type == Token::VARIABLE && token->variable != 'x'){//variabele is niet x 
-        Token* hulp = new Token();
-        hulp->type = Token::NUMBER;
-        hulp->number = 0;
-        return hulp;
-    }
-    // if (token->type == Token::POWER){// macht met constante
-    //     token->links 
-    //     Token* hulp = new Token();
-    //     hulp->type = Token::NUMBER;
-    //     hulp->number = 1;
-    //     return hulp;
+    // Token result; // Create a Token to store the differentieer
+
+    // if (token->type == Token::NUMBER){//constante
+    //     token->type = Token::NUMBER;
+    //     token->number = 0;
+
+    //     return token;
+    // }
+    // if (token->type == Token::VARIABLE && token->variable == 'x'){//variabele
+    //     token->type = Token::NUMBER;
+    //     token->number = 1;
+    //     return token;
+    // }
+    
+    // if (token->type == Token::VARIABLE && token->variable != 'x'){//variabele is niet x 
+    //     token->type = Token::NUMBER;
+    //     token->number = 0;
+    //     return token;
+    // }
+    // if (token->type == Token::PLUS) {
+    //     Token* resultaat = new Token();
+    //     resultaat->type = Token::PLUS;
+    //     resultaat->links = differentieer(token->links);
+    //     resultaat->rechts = differentieer(token->rechts);
+    //     return resultaat;
+    // }
+
+    // if (token->type == Token::TIMES) {
+
+    //     result.type = Token::PLUS;
+    //     result.links->type = Token::TIMES;
+    //     result.links->links = differentieerLeft;
+    //     result.links->rechts = token->rechts;
+    //     result.rechts->type = Token::TIMES;
+    //     result.rechts->links = token->links;
+    //     result.rechts->rechts = differentieerRight;
+
+
+    //     // token->links->rechts = differentieer(token->rechts);
+    //     // token->rechts->links = differentieer(token->links);
+
+
+    //     // token->links->type = Token::TIMES;
+    //     // token->links->links = token->links;
+
+
+    //     // token->rechts->type = Token::TIMES;
+    //     // token->rechts->rechts = token->rechts;
+
+    //     // token->type = Token::PLUS;
+
+    //     // return token;
+    // }
+
+    // if (token->type == Token::POWER) {
+    //     Token* base = token->links;
+    //     Token* exponent = token->rechts;
+
+    //     Token* leftTerm = new Token();
+    //     leftTerm->type = Token::TIMES;
+    //     leftTerm->links = exponent;
+    //     leftTerm->rechts = differentieer(base);
+
+    //     Token* rightTerm = new Token();
+    //     rightTerm->type = Token::POWER;
+    //     rightTerm->links = base;
+    //     rightTerm->rechts = new Token();
+    //     rightTerm->rechts->type = Token::MINUS;
+    //     rightTerm->rechts->links = exponent;
+    //     rightTerm->rechts->rechts = new Token();
+    //     rightTerm->rechts->rechts->type = Token::NUMBER;
+    //     rightTerm->rechts->rechts->number = 1;
+
+    //     Token* resultaat = new Token();
+    //     resultaat->type = Token::TIMES;
+    //     resultaat->links = leftTerm;
+    //     resultaat->rechts = rightTerm;
+
+    //     return resultaat;
+
     // }
 
 
+    // return result;
+// }
+
+Token* binaireBoom::differentieer(Token* token){
+
+    if(!token){
+        return nullptr;
+    }
+
+    Token* resultaat = new Token;
+
+    if (token->type == Token::NUMBER || 
+        (token->type == Token::VARIABLE && token->variable != 'x')){//constante of variabele dat geen x is
+
+        resultaat->type = Token::NUMBER;
+        resultaat->number = 0;
+
+    }
+    else if(token->type == Token::VARIABLE && token->variable == 'x'){//variabele
+        resultaat->type = Token::NUMBER;
+        resultaat->number = 1;
+    }
+    else if(token->type == Token::TIMES){ // product regel
+
+        resultaat->type = Token::PLUS;
+
+        resultaat->links = new Token;
+        resultaat->links->type = Token::TIMES;
+        resultaat->links->links = differentieer(token->links);
+        resultaat->links->rechts = token->rechts;
+
+        resultaat->rechts = new Token;
+        resultaat->rechts->type = Token::TIMES;
+        resultaat->rechts->links = token->links;
+        resultaat->rechts->rechts = differentieer(token->rechts);
+    }
+    else if (token->type == Token::DIVIDE){ // quotient regel
+        resultaat->type = Token::DIVIDE;
+        
+        //NAT - TAN
+        resultaat->links = new Token;
+        resultaat->links->type = Token::MINUS;
+
+        //NAT
+        Token* term1 = new Token;
+        term1->type = Token::TIMES;
+        term1->links = differentieer(token->links);
+        term1->rechts = token->rechts;
+
+        //TAN
+        Token* term2 = new Token;
+        term2->type = Token::TIMES;
+        term2->links = token->links;
+        term2->rechts = differentieer(token->rechts);
+
+        resultaat->links->links = term1;
+        resultaat->links->rechts = term2;
+
+        //N^2
+        resultaat->rechts = new Token;
+        resultaat->rechts->type = Token::POWER;
+        resultaat->rechts->links = token->rechts;
+        resultaat->rechts->rechts = new Token;
+        resultaat->rechts->rechts->type = Token::NUMBER;
+        resultaat->rechts->rechts->number = 2;
+    }
+    else if (token->type == Token::PLUS){
+        resultaat->type = Token::PLUS;
+        resultaat->links = differentieer(token->links);
+        resultaat->rechts = differentieer(token->rechts);
+    }
+    else if (token->type == Token::MINUS){
+        resultaat->type = Token::MINUS;
+        resultaat->links = differentieer(token->links);
+        resultaat->rechts = differentieer(token->rechts);
+    }
+    else if (token->type == Token::POWER ){ //macht met constante
+
+        if(token->links && token->links->type == Token::VARIABLE &&
+            token->links->variable == 'x' && token->rechts->type == Token::NUMBER){
+
+            resultaat->type = Token::TIMES;
+
+            int n = token->rechts->number;  // Get the constant exponent
+            Token* u = token->links;        // Get the base function
+
+            // Create the derivative expression
+            resultaat->links = new Token;
+            resultaat->links->type = Token::NUMBER;
+            resultaat->links->number = n;  // n
+
+            resultaat->rechts = new Token;
+            resultaat->rechts->type = Token::POWER;
+            resultaat->rechts->links = new Token;
+            resultaat->rechts->links = u;
+            resultaat->rechts->rechts = new Token;
+            resultaat->rechts->rechts->type = Token::NUMBER;
+            resultaat->rechts->rechts->number = n-1;
+        }
+
+    }
+    else if (token->type == Token::COSINE){
+
+        
+    }
+    else if (token->type == Token::SINE){
+
+    }
+
+        
+
+
+    return resultaat;
+
 }
+
 
 void binaireBoom::diffCall()
 {
     if(begin != nullptr){        
-        differentieer(begin);
+        begin = differentieer(begin);
     }
     else{
         std::cout << "There is no tree";
     }
     std::cout << std::endl;
 }
-
-
-
 
 bool binaireBoom::bijnaGelijk(double a, double b) {
     const double EPSILON = 1e-9;

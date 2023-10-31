@@ -34,26 +34,27 @@ struct Token{
 class binaireBoom{
     public:
         binaireBoom();
-        // binaireBoom(std::string invoerNaam);
         ~binaireBoom();
-        void verwijderBoom(Token* token);
-        std::string enumToString(int type);
-        void maakBoomCall(std::string formule);
-        Token* maakBoom(Token token);
-        bool maakToken(std::string karakter);
         std::vector<std::string> leesIn(std::string formule);
-        void printIOCall();
+        std::string enumToString(int type);
+        std::string plaatsToken(Token* token);
+        void verwijderBoom(Token* token);
         void printIO(Token* token);
         void printDOT(const std::string& uitvoerNaam);
         void printHelpDOT(Token* begin,std::ofstream& wegschrijven);
-        std::string plaatsToken(Token* token);
-        Token* simplify(Token* token);
-        void vereenvoudigCall();
         void evalueer(Token* token, double waarde);
+
+        void printIOCall();
+        void maakBoomCall(std::string formule);
+        void vereenvoudigCall();
         void evalCall(double waarde);
-        Token* differentieer(Token* token);
-        bool bijnaGelijk(double a, double b);
         void diffCall();
+
+        bool bijnaGelijk(double a, double b);
+        bool maakToken(std::string karakter);
+        Token* maakBoom(Token token);
+        Token* simplify(Token* token);
+        Token* differentieer(Token* token);
 
 
 
