@@ -48,15 +48,18 @@ int main(int argc, char** argv) {
 
         if (file.is_open() && std::getline(file, line)){
             keuze = line;
+            // std::cout << keuze << std::endl;
         }
         else if (!debugMode){
             std::getline(std::cin, keuze);
         }
-
+        
+        // std::cout << keuze << std::endl;
+        
         if (keuze.substr(0, 4) == "exp ") {
             std::string formule = keuze.substr(4);
             boom.maakBoomCall(formule);
-        } else if (keuze == "print") {
+        } else if (keuze.substr(0, 5) == "print") {
             boom.printIOCall();
         } else if (keuze.substr(0, 4) == "dot ") {
             std::string uitvoer = keuze.substr(4);
@@ -64,15 +67,17 @@ int main(int argc, char** argv) {
         } else if (keuze.substr(0, 5) == "eval ") {
             waarde = std::stod(keuze.substr(5));
             boom.evalCall(waarde);
-        } else if (keuze == "diff") {
+        } else if (keuze.substr(0, 4) == "diff") {
             boom.diffCall();
-        } else if (keuze == "simp") {
+        } else if (keuze.substr(0, 4) == "simp") {
             boom.vereenvoudigCall();
         } else if (keuze == "end") {
             menu = false;
         } else {
             std::cout << "Ongeldige instructie, probeer nog eens." << std::endl;
         }
+
+
     }
 
     if (file.is_open()) {

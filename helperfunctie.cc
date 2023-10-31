@@ -314,8 +314,9 @@ Token* binaireBoom::simplify(Token* token) {
 
     // Simplification rules go here
     if(token->type == Token::PLUS){
-        if (token->links && token->links->type == Token::NUMBER &&
-            token->rechts && token->rechts->type == Token::NUMBER) {
+        if (token->links && token->rechts &&
+            (token->links->type == Token::NUMBER || token->links->type == Token::PI) &&
+            (token->rechts->type == Token::NUMBER || token->rechts->type == Token::PI)) {
             // Simplify addition of two constants
             token->number = token->links->number + token->rechts->number;
             delete token->links;
@@ -339,8 +340,9 @@ Token* binaireBoom::simplify(Token* token) {
 
     }
     else if (token->type == Token::MINUS){
-        if(token->links && token->links->type == Token::NUMBER &&
-            token->rechts && token->rechts->type == Token::NUMBER) {
+        if(token->links && token->rechts &&
+            (token->links->type == Token::NUMBER || token->links->type == Token::PI) &&
+            (token->rechts->type == Token::NUMBER || token->rechts->type == Token::PI)) {
             // Simplify subtraction of two constants
             token->number = token->links->number - token->rechts->number;
             delete token->links;
@@ -370,14 +372,14 @@ Token* binaireBoom::simplify(Token* token) {
             return token->links;
             
         }
-        
-
     }
     else if(token->type == Token::TIMES){
 
-        if(token->links && token->links->type == Token::NUMBER &&
-            token->rechts && token->rechts->type == Token::NUMBER){
+        if(token->links && token->rechts &&
+            (token->links->type == Token::NUMBER || token->links->type == Token::PI) &&
+            (token->rechts->type == Token::NUMBER || token->rechts->type == Token::PI)){
             // Simplify multiplication of two constants
+            
             token->number = token->links->number * token->rechts->number;
             delete token->links;
             delete token->rechts;
@@ -412,8 +414,9 @@ Token* binaireBoom::simplify(Token* token) {
     }
     else if(token->type == Token::DIVIDE){
         
-        if(token->links && token->links->type == Token::NUMBER &&
-            token->rechts && token->rechts->type == Token::NUMBER && 
+        if(token->links && token->rechts &&
+            (token->links->type == Token::NUMBER || token->links->type == Token::PI) &&
+            (token->rechts->type == Token::NUMBER || token->rechts->type == Token::PI) &&
             token->rechts->number != 0){
             // Simplify division of two constants (excluding division by zero)
             token->number = token->links->number / token->rechts->number;
@@ -471,7 +474,7 @@ Token* binaireBoom::simplify(Token* token) {
         }
     } 
     else if(token->type == Token::TANGENT){
-        if(token->links && token->links->type == Token::NUMBER){
+        if(token->links && (token->links->type == Token::NUMBER || token->links->type == Token::PI)){
             if (token->links->number == 0 || bijnaGelijk(token->links->number, 3.141592)){
                 token->type = Token::NUMBER;
                 token->number = 0;
@@ -497,7 +500,8 @@ Token* binaireBoom::simplify(Token* token) {
             
             return token->links;
         }
-        else if (token->links->type == Token::NUMBER && token->rechts->type == Token::NUMBER){
+        else if ((token->links->type == Token::NUMBER||token->links->type == Token::PI)
+                 && (token->rechts->type == Token::NUMBER||token->rechts->type == Token::PI)){
             int base = token->links->number;
             int exp = token->rechts->number;
             int result = 1;
@@ -556,99 +560,6 @@ void binaireBoom::evalueer(Token* token, double waarde){
     evalueer(token->rechts, waarde);
 }
 
-// Token* binaireBoom::differentieer(Token* token) {
-    // if (!token){
-    //     return nullptr;
-    // }
-
-    // Token* differentieerLeft = differentieer(token->links);
-    // Token* differentieerRight = differentieer(token->rechts);
-
-    // Token result; // Create a Token to store the differentieer
-
-    // if (token->type == Token::NUMBER){//constante
-    //     token->type = Token::NUMBER;
-    //     token->number = 0;
-
-    //     return token;
-    // }
-    // if (token->type == Token::VARIABLE && token->variable == 'x'){//variabele
-    //     token->type = Token::NUMBER;
-    //     token->number = 1;
-    //     return token;
-    // }
-    
-    // if (token->type == Token::VARIABLE && token->variable != 'x'){//variabele is niet x 
-    //     token->type = Token::NUMBER;
-    //     token->number = 0;
-    //     return token;
-    // }
-    // if (token->type == Token::PLUS) {
-    //     Token* resultaat = new Token();
-    //     resultaat->type = Token::PLUS;
-    //     resultaat->links = differentieer(token->links);
-    //     resultaat->rechts = differentieer(token->rechts);
-    //     return resultaat;
-    // }
-
-    // if (token->type == Token::TIMES) {
-
-    //     result.type = Token::PLUS;
-    //     result.links->type = Token::TIMES;
-    //     result.links->links = differentieerLeft;
-    //     result.links->rechts = token->rechts;
-    //     result.rechts->type = Token::TIMES;
-    //     result.rechts->links = token->links;
-    //     result.rechts->rechts = differentieerRight;
-
-
-    //     // token->links->rechts = differentieer(token->rechts);
-    //     // token->rechts->links = differentieer(token->links);
-
-
-    //     // token->links->type = Token::TIMES;
-    //     // token->links->links = token->links;
-
-
-    //     // token->rechts->type = Token::TIMES;
-    //     // token->rechts->rechts = token->rechts;
-
-    //     // token->type = Token::PLUS;
-
-    //     // return token;
-    // }
-
-    // if (token->type == Token::POWER) {
-    //     Token* base = token->links;
-    //     Token* exponent = token->rechts;
-
-    //     Token* leftTerm = new Token();
-    //     leftTerm->type = Token::TIMES;
-    //     leftTerm->links = exponent;
-    //     leftTerm->rechts = differentieer(base);
-
-    //     Token* rightTerm = new Token();
-    //     rightTerm->type = Token::POWER;
-    //     rightTerm->links = base;
-    //     rightTerm->rechts = new Token();
-    //     rightTerm->rechts->type = Token::MINUS;
-    //     rightTerm->rechts->links = exponent;
-    //     rightTerm->rechts->rechts = new Token();
-    //     rightTerm->rechts->rechts->type = Token::NUMBER;
-    //     rightTerm->rechts->rechts->number = 1;
-
-    //     Token* resultaat = new Token();
-    //     resultaat->type = Token::TIMES;
-    //     resultaat->links = leftTerm;
-    //     resultaat->rechts = rightTerm;
-
-    //     return resultaat;
-
-    // }
-
-
-    // return result;
-// }
 
 Token* binaireBoom::differentieer(Token* token){
 
@@ -658,7 +569,7 @@ Token* binaireBoom::differentieer(Token* token){
 
     Token* resultaat = new Token;
 
-    if (token->type == Token::NUMBER || 
+    if (token->type == Token::NUMBER || token->type == Token::PI ||
         (token->type == Token::VARIABLE && token->variable != 'x')){//constante of variabele dat geen x is
 
         resultaat->type = Token::NUMBER;
@@ -723,14 +634,14 @@ Token* binaireBoom::differentieer(Token* token){
         resultaat->links = differentieer(token->links);
         resultaat->rechts = differentieer(token->rechts);
     }
-    else if (token->type == Token::POWER ){ //macht met constante
-
-        if(token->links && token->links->type == Token::VARIABLE &&
+    else if (token->type == Token::POWER ){
+        //macht met constante
+        if(token->links && token->links->type == Token::VARIABLE && 
             token->links->variable == 'x' && token->rechts->type == Token::NUMBER){
 
             resultaat->type = Token::TIMES;
 
-            int n = token->rechts->number;  // Get the constant exponent
+            double n = token->rechts->number;  // Get the constant exponent
             Token* u = token->links;        // Get the base function
 
             // Create the derivative expression
@@ -745,6 +656,34 @@ Token* binaireBoom::differentieer(Token* token){
             resultaat->rechts->rechts = new Token;
             resultaat->rechts->rechts->type = Token::NUMBER;
             resultaat->rechts->rechts->number = n-1;
+        }
+        else if(token->links && token->rechts &&
+            (token->links->type >= 0 || token->links->type <= 4) &&
+            (token->rechts->type == Token::NUMBER)){
+            
+            resultaat->type = Token::TIMES;
+
+            double n = token->rechts->number;
+            Token* u = token->links;
+
+            resultaat->links= new Token;
+            resultaat->links->type = Token::TIMES;
+
+            resultaat->rechts = differentieer(token->links);
+
+            resultaat->links->links = new Token;
+            resultaat->links->links->type= Token::NUMBER;
+            resultaat->links->links->number = n;
+
+            resultaat->links->rechts = new Token;
+            resultaat->links->rechts->type= Token::POWER;
+
+            resultaat->links->rechts->links = u;//unknown?
+
+            resultaat->links->rechts->rechts = new Token;
+            resultaat->links->rechts->rechts->type = Token::NUMBER;
+            resultaat->links->rechts->rechts->number = n-1;
+
         }
 
     }
@@ -776,11 +715,7 @@ Token* binaireBoom::differentieer(Token* token){
 
     }
 
-        
-
-
     return resultaat;
-
 }
 
 
