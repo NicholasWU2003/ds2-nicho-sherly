@@ -749,10 +749,30 @@ Token* binaireBoom::differentieer(Token* token){
 
     }
     else if (token->type == Token::COSINE){
+        resultaat->type = Token::TIMES;
 
+        resultaat->links = new Token;
+        resultaat->links->type = Token::TIMES;
+
+        resultaat->links->links = new Token;
+        resultaat->links->links->type = Token::NUMBER;
+
+        resultaat->links->links->number = -1; 
+
+        resultaat->links->rechts = new Token;
+        resultaat->links->rechts->type = Token::SINE;
+
+        resultaat->links->rechts->links = token->links; //binnen haakjes cos is binnen haakjes sin
+        resultaat->rechts = differentieer(token->links);// keer binnen afgeleiede haakjes
         
     }
     else if (token->type == Token::SINE){
+        resultaat->type = Token::TIMES;
+        
+        resultaat->links = new Token;
+        resultaat->links->type = Token::COSINE;
+        resultaat->links->links = token->links; //binnen haakjes sin is binnen haakjes cos
+        resultaat->rechts = differentieer(token->links); // keer afgeleide binnen haakjes
 
     }
 
